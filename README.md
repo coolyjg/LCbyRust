@@ -1,0 +1,2 @@
+# LCbyRust
+Have fun algorithming

@@ -2799,8 +2799,7 @@ pub fn remove_boxes(boxes: Vec<i32>) -> i32 {
             return 0;
         }
         if dp[l as usize][r as usize][k as usize] == 0 {
-            dp[l as usize][r as usize][k as usize] =
-                cal(boxes, l, r - 1, 0, dp) + (k + 1) * (k + 1);
+            dp[l as usize][r as usize][k as usize] = cal(boxes, l, r - 1, 0, dp) + (k + 1) * (k + 1);
             for i in l..r {
                 if boxes[i as usize] == boxes[r as usize] {
                     dp[l as usize][r as usize][k as usize] = dp[l as usize][r as usize][k as usize]
@@ -2812,67 +2811,4 @@ pub fn remove_boxes(boxes: Vec<i32>) -> i32 {
     }
     let mut dp = vec![vec![vec![0; boxes.len()]; boxes.len()]; boxes.len()];
     return cal(&boxes, 0, boxes.len() as i32 - 1, 0, &mut dp);
-}
-
-struct MyCalendarThree {
-    bp: BTreeMap<i32, i32>,
-}
-
-impl MyCalendarThree {
-    fn new() -> Self {
-        Self {
-            bp: BTreeMap::new(),
-        }
-    }
-
-    fn book(&mut self, start: i32, end: i32) -> i32 {
-        let e = self.bp.entry(start).or_insert(0);
-        *e += 1;
-        let e = self.bp.entry(end).or_insert(0);
-        *e -= 1;
-        let mut ans = 0;
-        let mut max = 0;
-        for (_, v) in self.bp.iter() {
-            ans += *v;
-            max = max.max(ans);
-        }
-        max
-    }
-}
-
-struct MyCalendarTwo {
-    bp: BTreeMap<i32, i32>,
-}
-
-impl MyCalendarTwo {
-    fn new() -> Self {
-        Self {
-            bp: BTreeMap::new(),
-        }
-    }
-
-    fn book(&mut self, start: i32, end: i32) -> bool {
-        let e = self.bp.entry(start).or_insert(0);
-        *e += 1;
-        let e = self.bp.entry(end).or_insert(0);
-        *e -= 1;
-        let mut ans = 0;
-        let mut max = 0;
-        let mut flag = true;
-        for (_, v) in self.bp.iter() {
-            ans += *v;
-            max = max.max(ans);
-            if max >= 3 {
-                flag = false;
-                break;
-            }
-        }
-        if flag == false {
-            let e = self.bp.entry(start).or_insert(0);
-            *e -= 1;
-            let e = self.bp.entry(end).or_insert(0);
-            *e += 1;
-        }
-        flag
-    }
 }

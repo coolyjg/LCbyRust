@@ -363,3 +363,10 @@ fn test_ip() {
     let query_ip = "20EE:FGb8:85a3:0:0:8A2E:0370:7334".to_string();
     assert_eq!("Neither".to_owned(), valid_ip_address(query_ip));
 }
+
+#[test]
+fn test_rand_pick(){
+    let sol = Solution::new(vec![vec![-2, -2, 1, 1], vec![2, 2, 4, 6]]);
+    let p = sol.pick();
+    assert_eq!(vec![0,0], p);
+}

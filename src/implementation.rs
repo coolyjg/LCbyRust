@@ -2753,13 +2753,13 @@ pub fn num_unique_emails(emails: Vec<String>) -> i32 {
     ans
 }
 
-struct Solution {
+struct Solution_0 {
     radius: f64,
     x_center: f64,
     y_center: f64,
 }
 
-impl Solution {
+impl Solution_0 {
     fn new(radius: f64, x_center: f64, y_center: f64) -> Self {
         Self {
             radius,
@@ -2874,5 +2874,87 @@ impl MyCalendarTwo {
             *e += 1;
         }
         flag
+    }
+}
+
+pub fn min_eating_speed(piles: Vec<i32>, h: i32) -> i32 {
+    let max = piles.iter().max().unwrap().to_owned();
+    let mut l = 1;
+    let mut r = max;
+    let mut ans = r;
+    fn get_time(piles: &Vec<i32>, speed: i32) -> i64 {
+        let mut t = 0;
+        for pile in piles {
+            t += ((pile + speed - 1) / speed) as i64;
+        }
+        t
+    }
+    while l < r {
+        let speed = l + (r - l) / 2;
+        let t = get_time(&piles, speed);
+        if t <= h as i64 {
+            ans = speed;
+            r = speed;
+        } else {
+            l = speed + 1;
+        }
+    }
+    ans
+}
+
+pub fn is_boomerang(points: Vec<Vec<i32>>) -> bool {
+    let (x1, x2, x3) = (points[0][0], points[1][0], points[2][0]);
+    let (y1, y2, y3) = (points[0][1], points[1][1], points[2][1]);
+    if (x1 == x2 && y1 == y2) || (x1 == x3 && y1 == y3) || (x2 == x3 && y2 == y3) {
+        return false;
+    }
+    if (y2 - y1) * (x3 - x2) == (y3 - y2) * (x2 - x1) {
+        return false;
+    }
+    return true;
+}
+
+pub struct Solution {
+    num: i32,
+    index: Vec<i32>,
+    rets: Vec<Vec<i32>>,
+}
+
+impl Solution {
+    pub fn new(rects: Vec<Vec<i32>>) -> Self {
+        let mut s = Solution {
+            num: 0,
+            index: Vec::new(),
+            rets: rects,
+        };
+        s.rets.sort_by(|a, b| a[0].cmp(&b[0]));
+        for i in 0..s.rets.len() {
+            s.index.push(s.num);
+            s.num += (s.rets[i][2] - s.rets[i][0] + 1) * (s.rets[i][3] - s.rets[i][1] + 1);
+        }
+        s
+    }
+
+    pub fn pick(&self) -> Vec<i32> {
+        let n = self.num;
+        let mut r = rand::thread_rng();
+        let index = r.gen_range(0..n);
+        let (mut l, mut r) = (0, self.index.len() - 1);
+        let mut ret_index = 0;
+        while l <= r {
+            let mid = l + (r - l) / 2;
+            if self.index[mid] > index {
+                r = mid - 1;
+            } else {
+                ret_index = mid;
+                l = mid + 1;
+            }
+        }
+        let diff = index - self.index[ret_index];
+        let y = diff / (self.rets[ret_index][2] - self.rets[ret_index][0] + 1)
+            + self.rets[ret_index][1];
+        let x = diff % (self.rets[ret_index][2] - self.rets[ret_index][0] + 1)
+            + self.rets[ret_index][0];
+        vec![x, y]
     }
 }

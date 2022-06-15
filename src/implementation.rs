@@ -294,6 +294,7 @@ pub struct NumArray {
     s: RefCell<Vec<i32>>,
 }
 
+#[allow(dead_code)]
 impl NumArray {
     pub fn new(nums: Vec<i32>) -> Self {
         let mut nums = nums;
@@ -310,7 +311,7 @@ impl NumArray {
 
     pub fn sum_range(&self, left: i32, right: i32) -> i32 {
         let s = &mut *self.s.borrow_mut();
-        let mut sum = 0;
+        let sum;
         if left == 0 {
             sum = (*s)[right as usize];
         } else {
@@ -526,12 +527,13 @@ pub fn pancake_sort(arr: Vec<i32>) -> Vec<i32> {
     ans
 }
 
+#[allow(unused_assignments)]
 pub fn push_dominoes(dominoes: String) -> String {
     let n = dominoes.len();
     let mut dominoes = dominoes.chars().collect::<Vec<char>>();
     let mut i = 0;
     let mut left = 'L';
-    let mut right = 'R';
+    let mut right;
     loop {
         if i >= n {
             break;
@@ -929,7 +931,6 @@ impl Bank {
 }
 
 pub fn divide_array(nums: Vec<i32>) -> bool {
-    let n = nums.len() / 2;
     let mut hp: HashMap<i32, i32> = HashMap::new();
     nums.iter().for_each(|x| {
         let h = hp.entry(*x).or_insert(0);
@@ -1180,19 +1181,19 @@ pub fn has_alternating_bits(n: i32) -> bool {
 
 pub fn cal_points(ops: Vec<String>) -> i32 {
     let mut ans = 0;
-    let mut score = vec![];
+    let mut score: Vec<i32> = vec![];
     ops.iter().for_each(|s| match s.as_str() {
         "C" => {
             ans -= score.last().unwrap();
             score.pop();
         }
         "D" => {
-            let n = score.last().unwrap();
+            let n = score.last().unwrap().to_owned();
             score.push(n * 2);
             ans += score.last().unwrap();
         }
         "+" => {
-            let n = score.last().unwrap();
+            let n = score.last().unwrap().to_owned();
             let n2 = score[score.len() - 2];
             score.push(n + n2);
             ans += score.last().unwrap();
@@ -1302,16 +1303,14 @@ pub fn rotate_string(s: String, goal: String) -> bool {
     false
 }
 
+#[allow(dead_code)]
 struct RandomizedSet {
     num: Vec<i32>,
     bt: BTreeMap<i32, usize>,
     total: usize,
 }
 
-/**
- * `&self` means the method takes an immutable reference.
- * If you need a mutable reference, change it to `&mut self` instead.
- */
+#[allow(dead_code)]
 impl RandomizedSet {
     fn new() -> Self {
         Self {
@@ -1322,7 +1321,7 @@ impl RandomizedSet {
     }
 
     fn insert(&mut self, val: i32) -> bool {
-        if let Some(idx) = self.bt.get(&val) {
+        if let Some(_idx) = self.bt.get(&val) {
             return false;
         } else {
             self.num.push(val);
@@ -1491,11 +1490,13 @@ pub fn reorder_log_files(logs: Vec<String>) -> Vec<String> {
     logs
 }
 
+#[allow(dead_code)]
 struct RecentCounter {
     mq: Vec<i32>,
     cnt: i32,
 }
 
+#[allow(dead_code)]
 impl RecentCounter {
     fn new() -> Self {
         Self {
@@ -1674,12 +1675,14 @@ pub fn largest_combination(candidates: Vec<i32>) -> i32 {
     cnt[cnt.len() - 1]
 }
 
+#[allow(dead_code)]
 struct MinStack {
     st: Vec<i32>,
     helper: Vec<i32>,
     len: i32,
 }
 
+#[allow(dead_code)]
 impl MinStack {
     fn new() -> Self {
         Self {
@@ -2057,8 +2060,8 @@ pub fn multiply(num1: String, num2: String) -> String {
     }
     let n1 = num1.len();
     let n2 = num2.len();
-    let mut nums1 = vec![];
-    let mut nums2 = vec![];
+    let nums1;
+    let nums2;
     nums1 = num1.chars().rev().collect::<Vec<char>>();
     nums2 = num2.chars().rev().collect::<Vec<char>>();
     let mut ans = vec![0; n1 + n2];
@@ -2753,13 +2756,15 @@ pub fn num_unique_emails(emails: Vec<String>) -> i32 {
     ans
 }
 
-struct Solution_0 {
+#[allow(dead_code)]
+struct Solution0 {
     radius: f64,
     x_center: f64,
     y_center: f64,
 }
 
-impl Solution_0 {
+#[allow(dead_code)]
+impl Solution0 {
     fn new(radius: f64, x_center: f64, y_center: f64) -> Self {
         Self {
             radius,
@@ -2814,10 +2819,12 @@ pub fn remove_boxes(boxes: Vec<i32>) -> i32 {
     return cal(&boxes, 0, boxes.len() as i32 - 1, 0, &mut dp);
 }
 
+#[allow(dead_code)]
 struct MyCalendarThree {
     bp: BTreeMap<i32, i32>,
 }
 
+#[allow(dead_code)]
 impl MyCalendarThree {
     fn new() -> Self {
         Self {
@@ -2840,10 +2847,12 @@ impl MyCalendarThree {
     }
 }
 
+#[allow(dead_code)]
 struct MyCalendarTwo {
     bp: BTreeMap<i32, i32>,
 }
 
+#[allow(dead_code)]
 impl MyCalendarTwo {
     fn new() -> Self {
         Self {
@@ -2957,4 +2966,268 @@ impl Solution {
             + self.rets[ret_index][0];
         vec![x, y]
     }
+}
+
+pub fn count_palindromic_subsequences(s: String) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    let n = s.len();
+    let mut dp = vec![vec![vec![0; n]; n]; 4];
+    for i in 0..n {
+        let k = (s[i] as u8 - 'a' as u8) as usize;
+        dp[k][i][i] = 1;
+    }
+    for len in 2..=n {
+        for i in 0..=n - len {
+            let j = i + len - 1;
+            for k in 0..4 {
+                if s[i] == s[j] && s[i] as u8 == 'a' as u8 + k {
+                    let mut sum: i64 = 0;
+                    for p in 0..4 {
+                        sum = (sum + dp[p][i + 1][j - 1] % 1000_000_007) % 1000_000_007;
+                    }
+                    dp[k as usize][i][j] = (2 + sum) % 1000_000_007;
+                } else if s[i] as u8 == 'a' as u8 + k && s[j] as u8 != 'a' as u8 + k {
+                    dp[k as usize][i][j] = dp[k as usize][i][j - 1];
+                } else if s[i] as u8 != 'a' as u8 + k && s[j] as u8 == 'a' as u8 + k {
+                    dp[k as usize][i][j] = dp[k as usize][i + 1][j];
+                } else {
+                    dp[k as usize][i][j] = dp[k as usize][i + 1][j - 1];
+                }
+            }
+        }
+    }
+    let mut ans = 0;
+    for i in 0..4 {
+        ans = (ans + dp[i][0][n - 1]) % 1000_000_007;
+    }
+    ans as i32
+}
+
+pub fn min_flips_mono_incr(s: String) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    let mut dp = vec![vec![0; 2]; s.len()];
+    match s[0] {
+        '0' => dp[0][1] = 1,
+        '1' => dp[0][0] = 1,
+        _ => {}
+    };
+    for i in 1..s.len() {
+        dp[i][0] = dp[i - 1][0] + if s[i] == '1' { 1 } else { 0 };
+        dp[i][1] = dp[i - 1][0].min(dp[i - 1][1]) + if s[i] == '0' { 1 } else { 0 };
+    }
+    dp[s.len() - 1][0].min(dp[s.len() - 1][1])
+}
+
+pub fn find_and_replace_pattern(words: Vec<String>, pattern: String) -> Vec<String> {
+    let pattern = pattern.chars().collect::<Vec<char>>();
+    let mut ans = vec![];
+    for word in words {
+        let word = word.chars().collect::<Vec<char>>();
+        let mut hp = HashMap::new();
+        let mut hp_rev = HashMap::new();
+        let mut flag = true;
+        for i in 0..word.len() {
+            match hp.get(&word[i]) {
+                None => {
+                    hp.insert(word[i], pattern[i]);
+                    if hp_rev.get(&pattern[i]).is_none() {
+                        hp_rev.insert(pattern[i], word[i]);
+                    } else {
+                        let c = hp_rev.get(&pattern[i]).unwrap();
+                        if *c != word[i] {
+                            flag = false;
+                            break;
+                        }
+                    }
+                }
+                Some(c) => {
+                    if *c != pattern[i] {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if flag {
+            ans.push(word.iter().collect::<String>());
+        }
+    }
+    ans
+}
+
+pub fn calculate_tax(brackets: Vec<Vec<i32>>, income: i32) -> f64 {
+    let mut ans: f64 = 0.0;
+    for i in 0..brackets.len() {
+        if income >= brackets[i][0] {
+            if i == 0 {
+                ans += brackets[i][0] as f64 * brackets[i][1] as f64 / 100.0;
+            } else {
+                ans += (brackets[i][0] - brackets[i - 1][0]) as f64 * brackets[i][1] as f64 / 100.0;
+            }
+        } else {
+            if i == 0 {
+                ans += income as f64 * brackets[i][1] as f64 / 100.0;
+            } else {
+                ans += (income - brackets[i - 1][0]) as f64 * brackets[i][1] as f64 / 100.0;
+            }
+            break;
+        }
+    }
+    ans
+}
+
+pub fn min_path_cost(grid: Vec<Vec<i32>>, move_cost: Vec<Vec<i32>>) -> i32 {
+    let m = grid.len();
+    let n = grid[0].len();
+    let mut dp = vec![vec![0; n]; m];
+    for i in 0..n {
+        dp[0][i] = grid[0][i];
+    }
+    for i in 1..m {
+        for j in 0..n {
+            let mut min = i32::MAX;
+            for k in 0..n {
+                min = min.min(dp[i - 1][k] + move_cost[grid[i - 1][k] as usize][j]);
+            }
+            dp[i][j] = min + grid[i][j];
+        }
+    }
+    let mut ans = i32::MAX;
+    for i in 0..n {
+        ans = ans.min(dp[m - 1][i]);
+    }
+    ans
+}
+
+pub fn distribute_cookies(cookies: Vec<i32>, k: i32) -> i32 {
+    fn dfs(bk: &mut Vec<i32>, cookies: &Vec<i32>, idx: usize, k: i32) -> i32 {
+        if idx == cookies.len() {
+            return bk.iter().max_by_key(|x| **x).unwrap().to_owned();
+        } else {
+            let mut temp = i32::MAX;
+            for i in 0..k {
+                bk[i as usize] += cookies[idx];
+                temp = temp.min(dfs(bk, cookies, idx + 1, k));
+                bk[i as usize] -= cookies[idx];
+            }
+            return temp;
+        }
+    }
+    let mut bk = vec![0; k as usize];
+    return dfs(&mut bk, &cookies, 0, k);
+}
+
+pub fn distinct_names(ideas: Vec<String>) -> i64 {
+    let mut hp = HashMap::new();
+    for s in &ideas {
+        hp.insert(s.clone(), 1);
+    }
+    let mut ans: i64 = 0;
+    for i in 0..ideas.len() {
+        for j in i + 1..ideas.len() {
+            let mut ia = ideas[i].clone().chars().collect::<Vec<char>>();
+            let mut ib = ideas[j].clone().chars().collect::<Vec<char>>();
+            let c = ia[0];
+            ia[0] = ib[0];
+            ib[0] = c;
+            let ia = ia.iter().collect::<String>();
+            let ib = ib.iter().collect::<String>();
+            if let Some(_) = hp.get(&ia) {
+                continue;
+            }
+            if let Some(_) = hp.get(&ib) {
+                continue;
+            }
+            ans += 1;
+        }
+    }
+    ans
+}
+
+pub fn height_checker(heights: Vec<i32>) -> i32 {
+    let mut new_heights = heights.clone();
+    new_heights.sort();
+    new_heights
+        .iter()
+        .zip(heights.iter())
+        .fold(0, |acc, (a, b)| acc + if a != b { 1 } else { 0 })
+}
+
+pub fn find_diagonal_order(mat: Vec<Vec<i32>>) -> Vec<i32> {
+    let mut mid: Vec<Vec<i32>> = vec![];
+    let m = mat.len();
+    let n = mat[0].len();
+    if m == 1 || n == 1 {
+        let mut ans = vec![];
+        for i in 0..m {
+            for j in 0..n {
+                ans.push(mat[i][j]);
+            }
+        }
+        return ans;
+    }
+    // scan by first row
+    for i in 0..n {
+        let mut tmp = vec![];
+        for j in 0..=i.min(m - 1) {
+            tmp.push(mat[j][i - j]);
+        }
+        mid.push(tmp);
+    }
+    // scan by last column
+    for j in 1..m {
+        let mut tmp = vec![];
+        let mut t = j;
+        let mut i = n as i32 - 1;
+        while i >= 0 && t < m {
+            tmp.push(mat[t][i as usize]);
+            t += 1;
+            i -= 1;
+        }
+        mid.push(tmp);
+    }
+    let mut ans = vec![];
+    for i in 0..mid.len() {
+        if i % 2 == 1 {
+            ans.append(&mut mid[i]);
+        } else {
+            for j in mid[i].iter().rev() {
+                ans.push(*j);
+            }
+        }
+    }
+    ans
+}
+
+pub fn smallest_distance_pair(nums: Vec<i32>, k: i32) -> i32 {
+    let mut nums = nums;
+    nums.sort();
+    fn bin_search(nums: &Vec<i32>, end: i32, target: i32) -> i32 {
+        let (mut l, mut r) = (0, end - 1);
+        while l <= r {
+            let mid = l + (r - l) / 2;
+            if nums[mid as usize] < target {
+                l = mid + 1;
+            } else {
+                r = mid - 1;
+            }
+        }
+        l
+    }
+    let range = nums[nums.len() - 1] - nums[0];
+    let (mut l, mut r) = (0i32, range);
+    while l <= r {
+        let mut cnt = 0;
+        let mid = l + (r - l) / 2;
+        for j in 0..nums.len() {
+            let idx = bin_search(&nums, j as i32, nums[j] - mid as i32);
+            cnt += j as i32 - idx;
+        }
+        if cnt < k {
+            l = mid + 1;
+        } else {
+            r = mid - 1;
+        }
+    }
+    l as i32
 }

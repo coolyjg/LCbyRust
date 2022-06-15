@@ -1,9 +1,6 @@
 use super::*;
-use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::rc::Rc;
-use test_utils::*;
 
 #[test]
 fn test_reverse_str() {
@@ -27,6 +24,8 @@ fn test_update_matrix() {
 
 #[test]
 fn test_diameter_of_binary_tree() {
+    use std::cell::RefCell;
+    use std::rc::Rc;
     let ll = TreeNode::new(4);
     let lr = TreeNode::new(5);
     let mut l = TreeNode::new(2);
@@ -281,6 +280,7 @@ fn test_has_alternating_bits() {
 
 #[test]
 fn test_cal_points() {
+    use test_utils::*;
     let ops = as2vstr(&["5", "2", "C", "D", "+"]);
     assert_eq!(30, cal_points(ops));
 }
@@ -288,11 +288,12 @@ fn test_cal_points() {
 #[test]
 fn test_max_consecutive_answers() {
     let answer_key = "TFFT".to_string();
-    // assert_eq!(3, max_consecutive_answers(answer_key, 1));
+    assert_eq!(3, max_consecutive_answers(answer_key, 1));
     let answer_key = "FFFTTFTTFT".to_string();
     assert_eq!(8, max_consecutive_answers(answer_key, 3));
 }
 
+#[allow(dead_code)]
 pub fn is_alien_sorted(words: Vec<String>, order: String) -> bool {
     fn cmp_string(a: &String, b: &String, order: &HashMap<char, usize>) -> bool {
         let a = a.chars().collect::<Vec<char>>();
@@ -365,8 +366,8 @@ fn test_ip() {
 }
 
 #[test]
-fn test_rand_pick(){
+fn test_rand_pick() {
     let sol = Solution::new(vec![vec![-2, -2, 1, 1], vec![2, 2, 4, 6]]);
     let p = sol.pick();
-    assert_eq!(vec![0,0], p);
+    assert_eq!(vec![0, 0], p);
 }

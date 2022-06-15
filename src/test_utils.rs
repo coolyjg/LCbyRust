@@ -1,10 +1,11 @@
-use std::convert::From;
 use std::vec::Vec;
 
+#[allow(dead_code)]
 pub fn vs2vstr(ori: Vec<&str>) -> Vec<String> {
     ori.iter().map(|&s| s.to_string()).collect()
 }
 
+#[allow(dead_code)]
 pub fn as2vstr(ori: &[&str]) -> Vec<String> {
     ori.iter().map(|&s| s.to_string()).collect()
 }

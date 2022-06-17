@@ -3231,3 +3231,109 @@ pub fn smallest_distance_pair(nums: Vec<i32>, k: i32) -> i32 {
     }
     l as i32
 }
+
+pub fn solve_sudoku(board: &mut Vec<Vec<char>>) {
+    let mut lines = vec![vec![false; 9]; 9];
+    let mut column = vec![vec![false; 9]; 9];
+    let mut space = vec![vec![vec![false; 9]; 3]; 3];
+    let mut omit = vec![];
+    for i in 0..board.len() {
+        for j in 0..board[0].len() {
+            if board[i][j] == '.' {
+                omit.push(vec![i, j]);
+            } else {
+                let n = board[i][j] as u8 - '1' as u8;
+                lines[i][n as usize] = true;
+                column[j][n as usize] = true;
+                space[i / 3][j / 3][n as usize] = true;
+            }
+        }
+    }
+    fn dfs(
+        board: &mut Vec<Vec<char>>,
+        lines: &mut Vec<Vec<bool>>,
+        column: &mut Vec<Vec<bool>>,
+        space: &mut Vec<Vec<Vec<bool>>>,
+        omit: &mut Vec<Vec<usize>>,
+        pos: usize,
+        valid: &mut bool,
+    ) {
+        if pos == omit.len() {
+            *valid = true;
+            return;
+        }
+        let (i, j) = (omit[pos][0], omit[pos][1]);
+        for num in 0..9 {
+            if *valid == true {
+                break;
+            }
+            if !lines[i][num] && !column[j][num] && !space[i / 3][j / 3][num] {
+                lines[i][num] = true;
+                column[j][num] = true;
+                space[i / 3][j / 3][num] = true;
+                board[i][j] = ('1' as u8 + num as u8) as char;
+                dfs(board, lines, column, space, omit, pos + 1, valid);
+                lines[i][num] = false;
+                column[j][num] = false;
+                space[i / 3][j / 3][num] = false;
+            }
+        }
+    }
+    let mut valid = false;
+    dfs(
+        board,
+        &mut lines,
+        &mut column,
+        &mut space,
+        &mut omit,
+        0,
+        &mut valid,
+    );
+}
+
+pub fn find_pairs(nums: Vec<i32>, k: i32) -> i32 {
+    let mut nums = nums;
+    nums.sort();
+    let mut j = 0;
+    let mut res = 0;
+    for i in 0..nums.len() {
+        if i != 0 && nums[i] == nums[i - 1] {
+            continue;
+        }
+        while j < nums.len() && (nums[j] - nums[i] < k || j <= i) {
+            j += 1;
+        }
+        if j < nums.len() && nums[j] - nums[i] == k {
+            res += 1;
+        }
+    }
+    res
+}
+
+pub fn duplicate_zeros(arr: &mut Vec<i32>) {
+    let mut i: i32 = -1;
+    let mut top = 0;
+    while top < arr.len() {
+        i += 1;
+        if arr[i as usize] != 0 {
+            top += 1;
+        } else {
+            top += 2;
+        }
+    }
+    let mut j: i32 = arr.len() as i32 - 1;
+    if top == arr.len() + 1 {
+        arr[j as usize] = 0;
+        j -= 1;
+        i -= 1;
+    }
+    while j >= 0 {
+        arr[j as usize] = arr[i as usize];
+        j -= 1;
+        if arr[i as usize] == 0 {
+            arr[j as usize] = 0;
+            j -= 1;
+        }
+        i -= 1;
+    }
+}

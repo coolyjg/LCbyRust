@@ -1,7 +1,8 @@
-mod implementation;
-
-mod test_utils;
+pub mod implementation;
+pub mod tree;
+pub mod test_utils;
 pub use implementation::*;
+pub use tree::*;
 //pub use tests::*;
 #[cfg(test)]
-mod tests;
+pub mod tests;

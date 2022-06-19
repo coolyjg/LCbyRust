@@ -2,7 +2,6 @@ use rand::{self, random, Rng};
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, HashMap, VecDeque};
-use std::rc::Rc;
 
 pub fn minimum_difference(nums: Vec<i32>, k: i32) -> i32 {
     if k == 1 {

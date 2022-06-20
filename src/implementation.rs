@@ -160,115 +160,6 @@ pub fn lucky_numbers(matrix: Vec<Vec<i32>>) -> Vec<i32> {
     ans
 }
 
-#[derive(Debug)]
-pub struct CustomStack {
-    s: RefCell<Vec<i32>>,
-    num: RefCell<i32>,
-    max_size: i32,
-    tail: RefCell<i32>,
-}
-
-impl CustomStack {
-    pub fn new(max_size: i32) -> Self {
-        CustomStack {
-            s: RefCell::new(vec![0; max_size as usize]),
-            num: RefCell::new(0),
-            max_size: max_size,
-            tail: RefCell::new(-1),
-        }
-    }
-
-    pub fn push(&self, x: i32) {
-        if self.num.borrow().eq(&self.max_size) {
-            return;
-        }
-        *self.num.borrow_mut() += 1;
-        *self.tail.borrow_mut() += 1;
-        let tail = *self.tail.borrow_mut() as usize;
-        let s = &mut *self.s.borrow_mut();
-        (*s)[tail] = x;
-    }
-
-    pub fn pop(&self) -> i32 {
-        if self.num.borrow().eq(&0) {
-            return 0;
-        }
-        *self.num.borrow_mut() -= 1;
-        let s = &mut *self.s.borrow_mut();
-        let tail = *self.tail.borrow_mut() as usize;
-        *self.tail.borrow_mut() -= 1;
-        s[tail]
-    }
-
-    pub fn increment(&self, k: i32, val: i32) {
-        let s = &mut *self.s.borrow_mut();
-        let len = *self.num.borrow();
-        let len = len.min(k);
-        for i in 0..len as usize {
-            (*s)[i] += val;
-        }
-    }
-}
-
-pub struct NumArray {
-    s: RefCell<Vec<i32>>,
-}
-
-#[allow(dead_code)]
-impl NumArray {
-    pub fn new(nums: Vec<i32>) -> Self {
-        let mut nums = nums;
-        for i in 0..nums.len() {
-            if i == 0 {
-                continue;
-            }
-            nums[i] = nums[i] + nums[i - 1];
-        }
-        Self {
-            s: RefCell::new(nums),
-        }
-    }
-
-    pub fn sum_range(&self, left: i32, right: i32) -> i32 {
-        let s = &mut *self.s.borrow_mut();
-        let sum;
-        if left == 0 {
-            sum = (*s)[right as usize];
-        } else {
-            sum = (*s)[right as usize] - (*s)[left as usize - 1];
-        }
-        sum
-    }
-}
-
-pub struct StreamRank {
-    stream: HashMap<i32, i32>,
-}
-
-impl StreamRank {
-    pub fn new() -> Self {
-        Self {
-            stream: HashMap::new(),
-        }
-    }
-
-    pub fn track(&mut self, x: i32) {
-        let h = self.stream.entry(x).or_insert(0);
-        *h += 1;
-    }
-
-    pub fn get_rank_of_number(&self, x: i32) -> i32 {
-        let h = &self.stream;
-        let mut sum = 0;
-        for (k, v) in h.iter() {
-            if *k <= x {
-                sum += v;
-            }
-        }
-        sum
-    }
-}
-
 pub fn next_permutation(nums: &mut Vec<i32>) {
     let len = nums.len();
     let mut flag = false;
@@ -793,62 +684,6 @@ pub fn count_max_or_subsets_2044(nums: Vec<i32>) -> i32 {
     helper(&nums, &mut max, t, &mut ans, 0);
     ans
 }
-pub struct Bank {
-    balance: RefCell<Vec<i64>>,
-    number_of_account: usize,
-}
-
-impl Bank {
-    pub fn new(balance: Vec<i64>) -> Self {
-        Self {
-            balance: RefCell::new(balance.clone()),
-            number_of_account: balance.len(),
-        }
-    }
-
-    pub fn transfer(&self, account1: i32, account2: i32, money: i64) -> bool {
-        println!("transfer: {} -> {}, amount: {}", account1, account2, money);
-        let n = self.number_of_account as i32;
-        if account1 > n || account2 > n {
-            return false;
-        }
-        let mut bal = self.balance.borrow_mut();
-        let remain = bal[account1 as usize - 1];
-        println!("acount1 remain: {}", remain);
-        if remain < money {
-            return false;
-        } else {
-            bal[account1 as usize - 1] -= money;
-            bal[account2 as usize - 1] += money;
-        }
-        true
-    }
-
-    pub fn deposit(&self, account: i32, money: i64) -> bool {
-        let n = self.number_of_account as i32;
-        if account > n {
-            return false;
-        }
-        let mut bal = self.balance.borrow_mut();
-        bal[account as usize - 1] += money;
-        true
-    }
-
-    pub fn withdraw(&self, account: i32, money: i64) -> bool {
-        let n = self.number_of_account as i32;
-        if account > n {
-            return false;
-        }
-        let mut bal = self.balance.borrow_mut();
-        let t = bal[account as usize - 1];
-        if t < money {
-            return false;
-        } else {
-            bal[account as usize - 1] -= money;
-        }
-        true
-    }
-}
 
 pub fn divide_array(nums: Vec<i32>) -> bool {
     let mut hp: HashMap<i32, i32> = HashMap::new();
@@ -1167,51 +1002,6 @@ pub fn rotate_string(s: String, goal: String) -> bool {
     false
 }
 
-#[allow(dead_code)]
-struct RandomizedSet {
-    num: Vec<i32>,
-    bt: BTreeMap<i32, usize>,
-    total: usize,
-}
-
-#[allow(dead_code)]
-impl RandomizedSet {
-    fn new() -> Self {
-        Self {
-            num: Vec::new(),
-            bt: BTreeMap::new(),
-            total: 0,
-        }
-    }
-
-    fn insert(&mut self, val: i32) -> bool {
-        if let Some(_idx) = self.bt.get(&val) {
-            return false;
-        } else {
-            self.num.push(val);
-            self.bt.insert(val, self.total);
-            self.total += 1;
-        }
-        true
-    }
-
-    fn remove(&mut self, val: i32) -> bool {
-        if let Some(&idx) = self.bt.get(&val) {
-            self.bt.remove(&val);
-            self.total -= 1;
-            self.num.remove(idx);
-            return true;
-        }
-        false
-    }
-
-    fn get_random(&self) -> i32 {
-        let mut rnd = rand::thread_rng();
-        let r = rnd.gen_range(0..self.total);
-        self.num.get(r).unwrap().clone()
-    }
-}
-
 pub fn max_rotate_function(nums: Vec<i32>) -> i32 {
     if nums.len() == 1 {
         return 0;
@@ -1352,45 +1142,6 @@ pub fn reorder_log_files(logs: Vec<String>) -> Vec<String> {
     let mut logs = logs;
     logs.sort_by(|x, y| log_cmp(x, y));
     logs
-}
-
-#[allow(dead_code)]
-struct RecentCounter {
-    mq: Vec<i32>,
-    cnt: i32,
-}
-
-#[allow(dead_code)]
-impl RecentCounter {
-    fn new() -> Self {
-        Self {
-            mq: Vec::new(),
-            cnt: 0,
-        }
-    }
-
-    fn ping(&mut self, t: i32) -> i32 {
-        if self.cnt == 0 {
-            self.mq.push(t);
-            self.cnt = 1;
-            return 1;
-        }
-        let mut index = 0;
-        if self.mq[0] >= t - 3000 {
-            self.mq.push(t);
-            self.cnt += 1;
-            return self.cnt;
-        }
-        self.mq.iter().enumerate().for_each(|(i, f)| {
-            if *f < t - 3000 {
-                index = i;
-            }
-        });
-        self.mq.push(t);
-        self.mq = self.mq.drain(index + 1..).collect();
-        self.cnt = self.mq.len() as i32;
-        return self.cnt;
-    }
 }
 
 pub fn min_distance_72(word1: String, word2: String) -> i32 {
@@ -1537,47 +1288,6 @@ pub fn largest_combination(candidates: Vec<i32>) -> i32 {
     }
     cnt.sort();
     cnt[cnt.len() - 1]
-}
-
-#[allow(dead_code)]
-struct MinStack {
-    st: Vec<i32>,
-    helper: Vec<i32>,
-    len: i32,
-}
-
-#[allow(dead_code)]
-impl MinStack {
-    fn new() -> Self {
-        Self {
-            st: Vec::new(),
-            helper: Vec::new(),
-            len: -1,
-        }
-    }
-
-    fn push(&mut self, val: i32) {
-        self.st.push(val);
-        self.helper.push(self.get_min().min(val));
-        self.len += 1;
-    }
-
-    fn pop(&mut self) {
-        self.st.pop();
-        self.helper.pop();
-        self.len -= 1;
-    }
-
-    fn top(&self) -> i32 {
-        self.st[self.len as usize]
-    }
-
-    fn get_min(&self) -> i32 {
-        if self.len == -1 {
-            return i32::MAX;
-        }
-        self.helper[self.len as usize]
-    }
 }
 
 pub fn find_kth_number(m: i32, n: i32, k: i32) -> i32 {
@@ -2583,35 +2293,6 @@ pub fn num_unique_emails(emails: Vec<String>) -> i32 {
     ans
 }
 
-#[allow(dead_code)]
-struct Solution0 {
-    radius: f64,
-    x_center: f64,
-    y_center: f64,
-}
-
-#[allow(dead_code)]
-impl Solution0 {
-    fn new(radius: f64, x_center: f64, y_center: f64) -> Self {
-        Self {
-            radius,
-            x_center,
-            y_center,
-        }
-    }
-
-    fn rand_point(&self) -> Vec<f64> {
-        let mut rng = rand::thread_rng();
-        loop {
-            let x = rng.gen_range(-self.radius..=self.radius);
-            let y = rng.gen_range(-self.radius..=self.radius);
-            if x * x + y * y <= self.radius * self.radius {
-                return vec![self.x_center + x, self.y_center + y];
-            }
-        }
-    }
-}
-
 pub fn max_product(nums: Vec<i32>) -> i32 {
     let mut fmax = nums.clone();
     let mut fmin = nums.clone();
@@ -2644,73 +2325,6 @@ pub fn remove_boxes(boxes: Vec<i32>) -> i32 {
     }
     let mut dp = vec![vec![vec![0; boxes.len()]; boxes.len()]; boxes.len()];
     return cal(&boxes, 0, boxes.len() as i32 - 1, 0, &mut dp);
-}
-
-#[allow(dead_code)]
-struct MyCalendarThree {
-    bp: BTreeMap<i32, i32>,
-}
-
-#[allow(dead_code)]
-impl MyCalendarThree {
-    fn new() -> Self {
-        Self {
-            bp: BTreeMap::new(),
-        }
-    }
-
-    fn book(&mut self, start: i32, end: i32) -> i32 {
-        let e = self.bp.entry(start).or_insert(0);
-        *e += 1;
-        let e = self.bp.entry(end).or_insert(0);
-        *e -= 1;
-        let mut ans = 0;
-        let mut max = 0;
-        for (_, v) in self.bp.iter() {
-            ans += *v;
-            max = max.max(ans);
-        }
-        max
-    }
-}
-
-#[allow(dead_code)]
-struct MyCalendarTwo {
-    bp: BTreeMap<i32, i32>,
-}
-
-#[allow(dead_code)]
-impl MyCalendarTwo {
-    fn new() -> Self {
-        Self {
-            bp: BTreeMap::new(),
-        }
-    }
-
-    fn book(&mut self, start: i32, end: i32) -> bool {
-        let e = self.bp.entry(start).or_insert(0);
-        *e += 1;
-        let e = self.bp.entry(end).or_insert(0);
-        *e -= 1;
-        let mut ans = 0;
-        let mut max = 0;
-        let mut flag = true;
-        for (_, v) in self.bp.iter() {
-            ans += *v;
-            max = max.max(ans);
-            if max >= 3 {
-                flag = false;
-                break;
-            }
-        }
-        if flag == false {
-            let e = self.bp.entry(start).or_insert(0);
-            *e -= 1;
-            let e = self.bp.entry(end).or_insert(0);
-            *e += 1;
-        }
-        flag
-    }
 }
 
 pub fn min_eating_speed(piles: Vec<i32>, h: i32) -> i32 {
@@ -2748,51 +2362,6 @@ pub fn is_boomerang(points: Vec<Vec<i32>>) -> bool {
         return false;
     }
     return true;
-}
-
-pub struct Solution {
-    num: i32,
-    index: Vec<i32>,
-    rets: Vec<Vec<i32>>,
-}
-
-impl Solution {
-    pub fn new(rects: Vec<Vec<i32>>) -> Self {
-        let mut s = Solution {
-            num: 0,
-            index: Vec::new(),
-            rets: rects,
-        };
-        s.rets.sort_by(|a, b| a[0].cmp(&b[0]));
-        for i in 0..s.rets.len() {
-            s.index.push(s.num);
-            s.num += (s.rets[i][2] - s.rets[i][0] + 1) * (s.rets[i][3] - s.rets[i][1] + 1);
-        }
-        s
-    }
-
-    pub fn pick(&self) -> Vec<i32> {
-        let n = self.num;
-        let mut r = rand::thread_rng();
-        let index = r.gen_range(0..n);
-        let (mut l, mut r) = (0, self.index.len() - 1);
-        let mut ret_index = 0;
-        while l <= r {
-            let mid = l + (r - l) / 2;
-            if self.index[mid] > index {
-                r = mid - 1;
-            } else {
-                ret_index = mid;
-                l = mid + 1;
-            }
-        }
-        let diff = index - self.index[ret_index];
-        let y = diff / (self.rets[ret_index][2] - self.rets[ret_index][0] + 1)
-            + self.rets[ret_index][1];
-        let x = diff % (self.rets[ret_index][2] - self.rets[ret_index][0] + 1)
-            + self.rets[ret_index][0];
-        vec![x, y]
-    }
 }
 
 pub fn count_palindromic_subsequences(s: String) -> i32 {
@@ -3163,4 +2732,62 @@ pub fn duplicate_zeros(arr: &mut Vec<i32>) {
         }
         i -= 1;
     }
+}
+
+pub fn greatest_letter(s: String) -> String {
+    let s = s.chars().collect::<Vec<char>>();
+    let mut hp = HashMap::new();
+    let mut ans = HashMap::new();
+    for c in s.iter() {
+        if c.is_uppercase() {
+            let cl = c.to_lowercase().to_string();
+            if hp.get(&cl).is_some() {
+                ans.insert(c.to_string(), 1);
+            } else {
+                hp.insert(c.to_string(), 1);
+            }
+        } else {
+            let cu = c.to_uppercase().to_string();
+            if hp.get(&cu).is_some() {
+                ans.insert(cu, 1);
+            } else {
+                hp.insert(c.to_string(), 1);
+            }
+        }
+    }
+    if ans.is_empty() {
+        return "".to_string();
+    }
+    let mut ret = String::from("");
+    for (k, _) in ans.iter() {
+        if ret.is_empty() {
+            ret = k.clone();
+        } else {
+            if k.cmp(&ret).is_gt() {
+                ret = k.clone();
+            }
+        }
+    }
+    ret
+}
+
+pub fn minimum_numbers(num: i32, k: i32) -> i32 {
+    if num == 0 {
+        return 0;
+    } else if num % 2 == 1 && k % 2 == 0 {
+        return -1;
+    } else if num % 10 != 0 && k == 0 {
+        return -1;
+    } else if num % 10 == k {
+        return 1;
+    } else if num < k {
+        return -1;
+    }
+    for i in 1..=10 {
+        let t = k * i;
+        if t % 10 == num % 10 && t <= num {
+            return t;
+        }
+    }
+    -1
 }

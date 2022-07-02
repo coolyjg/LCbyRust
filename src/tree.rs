@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -208,6 +208,135 @@ pub fn find_frequent_tree_sum(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
                 ans.push(*k);
             }
         }
+    }
+    ans
+}
+
+pub fn find_bottom_left_value(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    let mut q = vec![];
+    q.push(root.clone());
+    let mut cnt = 1;
+    let mut ret = root.clone().unwrap().borrow().val;
+    while !q.is_empty() {
+        let mut t = 0;
+        for i in 0..cnt {
+            let node = q[i].clone();
+            if i == 0 {
+                ret = node.clone().unwrap().borrow().val;
+            }
+            let left = node.clone().unwrap().borrow().left.clone();
+            let right = node.clone().unwrap().borrow().right.clone();
+            if left.is_some() {
+                q.push(left);
+                t += 1;
+            }
+            if right.is_some() {
+                q.push(right);
+                t += 1;
+            }
+        }
+        q.drain(0..cnt);
+        cnt = t;
+    }
+    ret
+}
+
+pub fn largest_values(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+    if root.is_none() {
+        return vec![];
+    }
+    let mut ans = vec![];
+    let mut dq = VecDeque::new();
+    dq.push_back(root.clone());
+    let mut idx = 0;
+    let mut cnt = 1;
+    while !dq.is_empty() {
+        let mut temp = 0;
+        for i in 0..cnt {
+            let node = dq.pop_front().unwrap();
+            if i == 0 {
+                ans.push(node.clone().unwrap().borrow().val);
+            } else {
+                ans[idx] = ans[idx].max(node.clone().unwrap().borrow().val);
+            }
+            let (l, r) = (
+                node.clone().unwrap().borrow().left.clone(),
+                node.clone().unwrap().borrow().right.clone(),
+            );
+            if l.is_some() {
+                dq.push_back(l);
+                temp += 1;
+            }
+            if r.is_some() {
+                dq.push_back(r);
+                temp += 1;
+            }
+        }
+        idx += 1;
+        cnt = temp;
+    }
+    ans
+}
+
+pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    fn dfs(root: Option<Rc<RefCell<TreeNode>>>, tmp: i32, ans: &mut i32) {
+        let l = root.clone().unwrap().borrow().left.clone();
+        let r = root.clone().unwrap().borrow().right.clone();
+        let val = root.clone().unwrap().borrow().val;
+        if l.is_none() && r.is_none() {
+            *ans += tmp * 10 + val;
+        }
+        if l.is_some() {
+            dfs(l, tmp * 10 + val, ans);
+        }
+        if r.is_some() {
+            dfs(r, tmp * 10 + val, ans);
+        }
+    }
+    let mut ans = 0;
+    dfs(root, 0, &mut ans);
+    ans
+}
+
+pub fn postorder_traversal(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+    let mut ans = vec![];
+    fn post_order(root: Option<Rc<RefCell<TreeNode>>>, ans: &mut Vec<i32>) {
+        if root.is_some() {
+            post_order(root.clone().unwrap().borrow().left.clone(), ans);
+            post_order(root.clone().unwrap().borrow().right.clone(), ans);
+            ans.push(root.clone().unwrap().borrow().val);
+        }
+    }
+    post_order(root, &mut ans);
+    ans
+}
+
+pub fn count_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    if root.is_none() {
+        return 0;
+    }
+    let mut ans = 0;
+    let mut q = VecDeque::new();
+    let mut cnt = 1;
+    ans += cnt;
+    q.push_back(root.clone());
+    while !q.is_empty() {
+        let mut tmp = 0;
+        for _ in 0..cnt {
+            let node = q.pop_front().unwrap();
+            let l = node.clone().unwrap().borrow().left.clone();
+            let r = node.clone().unwrap().borrow().right.clone();
+            if l.is_some() {
+                q.push_back(l);
+                tmp += 1;
+            }
+            if r.is_some() {
+                q.push_back(r);
+                tmp += 1;
+            }
+        }
+        cnt = tmp;
+        ans += cnt;
     }
     ans
 }

@@ -1,25 +1,25 @@
-use std::cell::RefCell;
-use std::collections::{HashMap, BTreeMap};
 use rand::{self, Rng};
+use std::cell::RefCell;
+use std::collections::{BTreeMap, HashMap};
 
+#[allow(dead_code)]
 struct RangeModule {
     range: Vec<Vec<i32>>,
 }
 
+#[allow(dead_code)]
 impl RangeModule {
     fn new() -> Self {
         //println!("new an instance");
-        Self {
-            range: Vec::new(),
-        }
+        Self { range: Vec::new() }
     }
 
     fn add_range(&mut self, left: i32, right: i32) {
         //println!("ADD: before: {:?}, target: [{}, {})", self.range, left, right);
-        if self.range.len() == 0{
+        if self.range.len() == 0 {
             self.range.push(vec![left, right]);
             //println!("ADD: after: {:?}", self.range);
-            return ;
+            return;
         }
         let (mut l, mut r) = (0i32, self.range.len() as i32 - 1);
         while l <= r {
@@ -44,14 +44,14 @@ impl RangeModule {
             r += 1;
             let mut rm = vec![];
             let mut right = right;
-            while r < self.range.len() && self.range[r][0] <= right{
+            while r < self.range.len() && self.range[r][0] <= right {
                 if self.range[r][1] <= right {
                     rm.push(r);
                 } else {
-                    if flag == true{
+                    if flag == true {
                         self.range[old][1] = self.range[r][1];
                         rm.push(r);
-                    }else{
+                    } else {
                         right = self.range[r][1];
                         rm.push(r);
                     }
@@ -62,7 +62,7 @@ impl RangeModule {
             for i in rm.iter().rev() {
                 self.range.remove(*i);
             }
-            if flag == false{
+            if flag == false {
                 self.range.push(vec![left, right]);
                 self.range.sort_by_key(|x| x[0]);
             }
@@ -70,7 +70,7 @@ impl RangeModule {
             let mut right = right;
             let mut ll = 0;
             let mut rm = vec![];
-            while ll < self.range.len() && self.range[ll][0] <= right{
+            while ll < self.range.len() && self.range[ll][0] <= right {
                 if self.range[ll][1] <= right {
                     rm.push(ll as usize);
                 } else {
@@ -92,7 +92,7 @@ impl RangeModule {
 
     fn query_range(&self, left: i32, right: i32) -> bool {
         //println!("QRY: range = {:?}, target: [{}, {})", self.range, left, right);
-        let (mut l, mut r) = (0i32, self.range.len() as i32-1);
+        let (mut l, mut r) = (0i32, self.range.len() as i32 - 1);
         while l <= r {
             let mid = l + (r - l) / 2;
             if self.range[mid as usize][0] > left {
@@ -101,7 +101,7 @@ impl RangeModule {
                 l = mid + 1;
             }
         }
-        if r == -1{
+        if r == -1 {
             return false;
         }
         if self.range[r as usize][0] <= left && right <= self.range[r as usize][1] {
@@ -112,7 +112,7 @@ impl RangeModule {
 
     fn remove_range(&mut self, left: i32, right: i32) {
         //println!("DEL: before: {:?}, target: [{}, {})", self.range, left, right);
-        let (mut l, mut r) = (0i32, self.range.len() as i32-1);
+        let (mut l, mut r) = (0i32, self.range.len() as i32 - 1);
         while l <= r {
             let mid = l + (r - l) / 2;
             if self.range[mid as usize][0] > left {
@@ -139,7 +139,7 @@ impl RangeModule {
             }
             let mut ll = l + 1;
             let mut rm = vec![];
-            while ll < self.range.len() && self.range[ll][0] <= right{
+            while ll < self.range.len() && self.range[ll][0] <= right {
                 if self.range[ll][1] <= right {
                     rm.push(ll);
                 } else {
@@ -598,5 +598,78 @@ impl Solution {
         let x = diff % (self.rets[ret_index][2] - self.rets[ret_index][0] + 1)
             + self.rets[ret_index][0];
         vec![x, y]
+    }
+}
+
+#[allow(dead_code)]
+struct Solution710 {
+    bound: i32,
+    hp: HashMap<i32, i32>,
+}
+
+#[allow(dead_code)]
+impl Solution710 {
+    fn new(n: i32, blacklist: Vec<i32>) -> Self {
+        let mut hp = HashMap::new();
+        let bound = n - blacklist.len() as i32;
+        let mut black = vec![];
+        for &b in blacklist.iter() {
+            if b >= bound {
+                black.push(b);
+            }
+        }
+        let mut w = bound;
+        for &b in blacklist.iter() {
+            if b < bound {
+                while black.contains(&w) {
+                    w += 1;
+                }
+                hp.insert(b, w);
+                w += 1;
+            }
+        }
+        Self { bound, hp }
+    }
+
+    fn pick(&self) -> i32 {
+        let mut rng = rand::thread_rng();
+        let n = rng.gen_range(0..self.bound);
+        if let Some(x) = self.hp.get(&n) {
+            return *x;
+        }
+        n
+    }
+}
+
+#[allow(dead_code)]
+struct Codec {
+    db: HashMap<i32, String>,
+    cnt: i32,
+}
+
+#[allow(dead_code)]
+impl Codec {
+    fn new() -> Self {
+        Self {
+            db: HashMap::new(),
+            cnt: 0,
+        }
+    }
+
+    #[allow(non_snake_case)]
+    // Encodes a URL to a shortened URL.
+    fn encode(&mut self, longURL: String) -> String {
+        self.db.insert(self.cnt + 1, longURL);
+        self.cnt += 1;
+        self.cnt.to_string()
+    }
+
+    #[allow(non_snake_case)]
+    // Decodes a shortened URL to its original URL.
+    fn decode(&self, shortURL: String) -> String {
+        self.db
+            .get(&shortURL.parse::<i32>().unwrap())
+            .unwrap()
+            .to_owned()
     }
 }

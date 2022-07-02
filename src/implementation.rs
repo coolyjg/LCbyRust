@@ -1,7 +1,6 @@
-use rand::{self, random, Rng};
-use std::cell::RefCell;
+use rand::{self, random};
 use std::cmp::Ordering;
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{HashMap, VecDeque};
 
 pub fn minimum_difference(nums: Vec<i32>, k: i32) -> i32 {
     if k == 1 {
@@ -2787,6 +2786,215 @@ pub fn minimum_numbers(num: i32, k: i32) -> i32 {
         let t = k * i;
         if t % 10 == num % 10 && t <= num {
             return t;
+        }
+    }
+    -1
+}
+
+pub fn defang_i_paddr(address: String) -> String {
+    address.replace(".", "[.]")
+}
+
+pub fn number_of_lines(widths: Vec<i32>, s: String) -> Vec<i32> {
+    s.chars()
+        .map(|c| c as usize - 'a' as usize)
+        .collect::<Vec<_>>()
+        .iter()
+        .fold(vec![1, 0], |acc, &x| {
+            if acc[1] + widths[x] > 100 {
+                vec![acc[0] + 1, widths[x]]
+            } else {
+                vec![acc[0], acc[1] + widths[x]]
+            }
+        })
+}
+
+pub fn min_cost(costs: Vec<Vec<i32>>) -> i32 {
+    let n = costs.len();
+    let mut dp = vec![vec![i32::MAX; 3]; n];
+    dp[0][0] = costs[0][0];
+    dp[0][1] = costs[0][1];
+    dp[0][2] = costs[0][2];
+    for i in 1..n {
+        dp[i][0] = dp[i - 1][1].min(dp[i - 1][2]) + costs[i][0];
+        dp[i][1] = dp[i - 1][0].min(dp[i - 1][2]) + costs[i][1];
+        dp[i][2] = dp[i - 1][0].min(dp[i - 1][1]) + costs[i][2];
+    }
+    dp[n - 1][0].min(dp[n - 1][1].min(dp[n - 1][2]))
+}
+
+pub fn check_x_matrix(grid: Vec<Vec<i32>>) -> bool {
+    for i in 0..grid.len() {
+        for j in 0..grid[0].len() {
+            if i == j || i + j == grid.len() - 1 {
+                if grid[i][j] == 0 {
+                    return false;
+                }
+            } else if grid[i][j] != 0 {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+pub fn count_house_placements(n: i32) -> i32 {
+    let mut dp: Vec<Vec<i64>> = vec![vec![0; 4]; n as usize];
+    dp[0][0] = 1;
+    dp[0][1] = 1;
+    dp[0][2] = 1;
+    dp[0][3] = 1;
+    for i in 1..n as usize {
+        dp[i][0] = (dp[i - 1][0] + dp[i - 1][1] + dp[i - 1][2] + dp[i - 1][3]) % 1_000_000_007;
+        dp[i][1] = (dp[i - 1][0] + dp[i - 1][2]) % 1_000_000_007;
+        dp[i][2] = (dp[i - 1][0] + dp[i - 1][1]) % 1_000_000_007;
+        dp[i][3] = dp[i - 1][0];
+    }
+    let n = n as usize;
+    ((dp[n - 1][0] + dp[n - 1][1] + dp[n - 1][2] + dp[n - 1][3]) % 1_000_000_007) as i32
+}
+
+pub fn find_lu_slength(strs: Vec<String>) -> i32 {
+    fn is_substr(s1: &Vec<char>, s2: &Vec<char>) -> bool {
+        let mut i1 = 0;
+        let mut i2 = 0;
+        let l1 = s1.len();
+        let l2 = s2.len();
+        while i1 < l1 && i2 < l2 {
+            if s1[i1] == s2[i2] {
+                i1 += 1;
+            }
+            i2 += 1;
+        }
+        if i1 == l1 {
+            return true;
+        }
+        false
+    }
+    let strs = strs
+        .into_iter()
+        .map(|s| s.chars().collect::<Vec<char>>())
+        .collect::<Vec<Vec<char>>>();
+    let mut ans = -1;
+    for i in 0..strs.len() {
+        let mut flag = true;
+        for j in 0..strs.len() {
+            if i != j {
+                if is_substr(&strs[i], &strs[j]) {
+                    flag = false;
+                    break;
+                }
+            }
+        }
+        if flag {
+            ans = ans.max(strs[i].len() as i32);
+        }
+    }
+    ans
+}
+
+pub fn wiggle_sort(nums: &mut Vec<i32>) {
+    let x = (nums.len() + 1) / 2;
+    let mut cpy = nums.clone();
+    cpy.sort();
+    let mut i = 0;
+    let mut j = x - 1;
+    let mut k = nums.len() - 1;
+    while i < nums.len() {
+        nums[i] = cpy[j];
+        if i + 1 < nums.len() {
+            nums[i + 1] = cpy[k]
+        }
+        i += 1;
+        j -= 1;
+        k -= 1;
+    }
+}
+
+pub fn num_prime_arrangements(n: i32) -> i32 {
+    fn prime_num(n: i32) -> i32 {
+        // 第0位不要
+        let mut nums = vec![1; n as usize + 1];
+        for i in 2..nums.len() {
+            if nums[i] == 1 {
+                for j in 2..=n as usize / i {
+                    nums[i * j] = 0;
+                }
+            }
+        }
+        nums.iter().skip(2).fold(0, |acc, x| acc + x)
+    }
+    let n1 = prime_num(n);
+    let n2 = n - n1;
+    let mut ans: i64 = 1;
+    for i in 1..=n1 {
+        ans = ans * i as i64 % 1_000_000_007;
+    }
+    for i in 1..=n2 {
+        ans = ans * i as i64 % 1_000_000_007;
+    }
+    ans as i32
+}
+
+pub fn count_primes(n: i32) -> i32 {
+    if n == 0 || n == 1 || n == 2 {
+        return 0;
+    }
+    let mut nums = vec![1; n as usize];
+    for num in 2..nums.len() {
+        if nums[num] == 1 {
+            for i in 2..=(n as usize - 1) / num {
+                nums[num * i] = 0;
+            }
+        }
+    }
+    nums.iter().skip(2).fold(0, |acc, x| acc + x)
+}
+
+pub fn diff_ways_to_compute(expression: String) -> Vec<i32> {
+    let mut ans = vec![];
+    let n = expression.len();
+    if n == 0 {
+        return ans;
+    }
+    let c = expression.as_bytes();
+    for i in 0..n {
+        match c[i] {
+            b'+' | b'-' | b'*' => {
+                let left = diff_ways_to_compute(expression[..i].to_owned());
+                let right = diff_ways_to_compute(expression[i + 1..].to_owned());
+                for l in left.iter() {
+                    for r in right.iter() {
+                        match c[i] {
+                            b'+' => ans.push(l + r),
+                            b'-' => ans.push(l - r),
+                            _ => ans.push(l * r),
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    if ans.is_empty() {
+        return vec![expression.parse::<i32>().unwrap()];
+    }
+    ans
+}
+
+pub fn min_refuel_stops(target: i32, start_fuel: i32, stations: Vec<Vec<i32>>) -> i32 {
+    let mut dp = vec![0; stations.len() + 1];
+    dp[0] = start_fuel;
+    for (idx, station) in stations.iter().enumerate() {
+        for j in (0..=idx).rev() {
+            if dp[j] >= station[0] {
+                dp[j + 1] = dp[j + 1].max(dp[j] + station[1]);
+            }
+        }
+    }
+    for i in 0..dp.len() {
+        if dp[i] >= target {
+            return i as i32;
         }
     }
     -1

@@ -2999,3 +2999,87 @@ pub fn min_refuel_stops(target: i32, start_fuel: i32, stations: Vec<Vec<i32>>) -
     }
     -1
 }
+
+pub fn decode_message(key: String, message: String) -> String {
+    let mut hp = HashMap::new();
+    let key = key.chars().collect::<Vec<char>>();
+    for (_, &k) in key.iter().enumerate() {
+        match hp.get(&k) {
+            Some(_) => {
+                continue;
+            }
+            None => {
+                if k == ' ' {
+                    continue;
+                }
+                hp.insert(k, ('a' as u8 + hp.len() as u8) as char);
+            }
+        }
+    }
+    let message = message.chars().collect::<Vec<char>>();
+    let mut ans = Vec::<char>::new();
+    for c in message {
+        if c == ' ' {
+            ans.push(' ');
+            continue;
+        }
+        ans.push(hp.get(&c).unwrap().to_owned());
+    }
+    ans.iter().collect()
+}
+
+pub fn next_greater_element(n: i32) -> i32 {
+    let mut nums = vec![];
+    let ori = n;
+    let mut n = n;
+    while n != 0 {
+        nums.push(n % 10);
+        n /= 10;
+    }
+    let mut idx = -1;
+    for i in 0..nums.len() {
+        if i == nums.len() - 1 {
+            return -1;
+        } else if nums[i + 1] < nums[i] {
+            idx = i as i32;
+            break;
+        }
+    }
+    let mut swap_idx = 0;
+    while swap_idx <= idx {
+        if nums[swap_idx as usize] > nums[idx as usize + 1] {
+            break;
+        }
+        swap_idx += 1;
+    }
+    nums.swap(swap_idx as usize, idx as usize + 1);
+    let mut cpy = nums.drain(0..=idx as usize).collect::<Vec<i32>>();
+    cpy.sort_by(|a, b| b.cmp(a));
+    cpy.append(&mut nums);
+    cpy = cpy.into_iter().rev().collect::<Vec<i32>>();
+    let mut ans: i64 = 0;
+    for n in cpy {
+        ans = ans * 10 + n as i64;
+    }
+    if ori > 0 && ans > i32::MAX as i64 {
+        return -1;
+    }
+    ans as i32
+}
+
+pub fn minimum_abs_difference(arr: Vec<i32>) -> Vec<Vec<i32>> {
+    let mut ans = vec![];
+    let mut arr = arr;
+    arr.sort();
+    let mut min = i32::MAX;
+    for i in 0..arr.len() - 1 {
+        if arr[i + 1] - arr[i] < min {
+            min = arr[i + 1] - arr[i];
+            ans.drain(..);
+            ans.push(vec![arr[i], arr[i + 1]]);
+        } else if arr[i + 1] - arr[i] == min {
+            ans.push(vec![arr[i], arr[i + 1]]);
+        }
+    }
+    ans
+}

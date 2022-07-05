@@ -556,15 +556,15 @@ impl MyCalendarTwo {
     }
 }
 
-pub struct Solution {
+pub struct SolutionCal {
     num: i32,
     index: Vec<i32>,
     rets: Vec<Vec<i32>>,
 }
 
-impl Solution {
+impl SolutionCal {
     pub fn new(rects: Vec<Vec<i32>>) -> Self {
-        let mut s = Solution {
+        let mut s = SolutionCal {
             num: 0,
             index: Vec::new(),
             rets: rects,
@@ -671,5 +671,69 @@ impl Codec {
             .get(&shortURL.parse::<i32>().unwrap())
             .unwrap()
             .to_owned()
+    }
+}
+
+#[allow(dead_code)]
+struct MyHashSet {
+    hp: HashMap<i32, bool>,
+}
+
+#[allow(dead_code)]
+impl MyHashSet {
+    fn new() -> Self {
+        Self { hp: HashMap::new() }
+    }
+
+    fn add(&mut self, key: i32) {
+        self.hp.insert(key, true);
+    }
+
+    fn remove(&mut self, key: i32) {
+        self.hp.remove(&key);
+    }
+
+    fn contains(&self, key: i32) -> bool {
+        if let Some(_) = self.hp.get(&key) {
+            return true;
+        }
+        false
+    }
+}
+
+#[allow(dead_code)]
+struct MyCalendar {
+    bm: BTreeMap<i32, i32>,
+}
+
+#[allow(dead_code)]
+impl MyCalendar {
+    fn new() -> Self {
+        Self {
+            bm: BTreeMap::new(),
+        }
+    }
+
+    fn book(&mut self, start: i32, end: i32) -> bool {
+        let mut flag = true;
+        let e = self.bm.entry(start).or_insert(0);
+        *e += 1;
+        let e = self.bm.entry(end).or_insert(0);
+        *e -= 1;
+        let mut cnt = 0;
+        for (_, v) in self.bm.iter() {
+            cnt += v;
+            if cnt > 1 {
+                flag = false;
+                break;
+            }
+        }
+        if flag == false {
+            let e = self.bm.entry(start).or_insert(0);
+            *e -= 1;
+            let e = self.bm.entry(end).or_insert(0);
+            *e += 1;
+        }
+        flag
     }
 }

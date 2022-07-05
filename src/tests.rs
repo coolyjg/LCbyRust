@@ -367,7 +367,7 @@ fn test_ip() {
 
 #[test]
 fn test_rand_pick() {
-    let sol = Solution::new(vec![vec![-2, -2, 1, 1], vec![2, 2, 4, 6]]);
+    let sol = SolutionCal::new(vec![vec![-2, -2, 1, 1], vec![2, 2, 4, 6]]);
     let p = sol.pick();
     assert_eq!(vec![0, 0], p);
 }

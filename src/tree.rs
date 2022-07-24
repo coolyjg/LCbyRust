@@ -340,3 +340,88 @@ pub fn count_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
     }
     ans
 }
+
+pub fn evaluate_tree(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+    fn in_order(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+        // if root.is_some(){
+        let val = root.clone().unwrap().borrow().val;
+        if val == 0 {
+            return false;
+        } else if val == 1 {
+            return true;
+        }
+        let left = root.clone().unwrap().borrow().left.clone();
+        let right = root.clone().unwrap().borrow().right.clone();
+        let l = in_order(left);
+        let r = in_order(right);
+        if val == 2 {
+            return l || r;
+        } else {
+            return l && r;
+        }
+        // }
+        // false
+    }
+    in_order(root)
+}
+
+pub fn check_sub_tree(
+    t1: Option<Rc<RefCell<TreeNode>>>,
+    t2: Option<Rc<RefCell<TreeNode>>>,
+) -> bool {
+    if t1.is_none() && t2.is_none() {
+        return true;
+    }
+    if t1.is_some() && t2.is_none() {
+        return false;
+    }
+    if t1.is_none() && t2.is_some() {
+        return false;
+    }
+    if t1.clone().unwrap().borrow().val != t2.clone().unwrap().borrow().val {
+        return check_sub_tree(t1.clone().unwrap().borrow().left.clone(), t2.clone())
+            || check_sub_tree(t1.clone().unwrap().borrow().right.clone(), t2.clone());
+    } else {
+        return (check_sub_tree(
+            t1.clone().unwrap().borrow().left.clone(),
+            t2.clone().unwrap().borrow().left.clone(),
+        ) && check_sub_tree(
+            t1.clone().unwrap().borrow().right.clone(),
+            t2.clone().unwrap().borrow().right.clone(),
+        )) || check_sub_tree(t1.clone().unwrap().borrow().left.clone(), t2.clone())
+            || check_sub_tree(t1.clone().unwrap().borrow().right.clone(), t2.clone());
+    }
+}
+
+pub fn prune_tree(root: Option<Rc<RefCell<TreeNode>>>) -> Option<Rc<RefCell<TreeNode>>> {
+    let mut root = root;
+    fn post_order(root: &mut Option<Rc<RefCell<TreeNode>>>) -> bool {
+        if root.is_some() {
+            let mut left = root.clone().unwrap().borrow().left.clone();
+            let mut right = root.clone().unwrap().borrow().right.clone();
+            let val = root.clone().unwrap().borrow().val;
+            if !post_order(&mut left) {
+                root.as_mut().unwrap().borrow_mut().left = None;
+            }
+            if !post_order(&mut right) {
+                root.as_mut().unwrap().borrow_mut().right = None;
+            }
+            if !post_order(&mut left) && !post_order(&mut right) && val == 0 {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        false
+    }
+    if post_order(&mut root) {
+        return root;
+    } else {
+        let val = root.clone().unwrap().borrow().val;
+        if val == 0 {
+            return None;
+        } else {
+            return root;
+        }
+    }
+}

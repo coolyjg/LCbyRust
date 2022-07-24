@@ -1,6 +1,6 @@
 use rand::{self, Rng};
 use std::cell::RefCell;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, VecDeque};
 
 #[allow(dead_code)]
 struct RangeModule {
@@ -735,5 +735,194 @@ impl MyCalendar {
             *e += 1;
         }
         flag
+    }
+}
+
+struct MyStack {
+    st: Vec<i32>,
+}
+
+impl MyStack {
+    fn new() -> Self {
+        Self { st: Vec::new() }
+    }
+
+    fn push(&mut self, x: i32) {
+        self.st.push(x);
+    }
+
+    fn pop(&mut self) -> i32 {
+        self.st.pop().unwrap()
+    }
+
+    fn top(&self) -> i32 {
+        self.st.last().unwrap().to_owned()
+    }
+
+    fn empty(&self) -> bool {
+        self.st.is_empty()
+    }
+}
+
+struct MyQueue {
+    q: VecDeque<i32>,
+}
+
+impl MyQueue {
+    fn new() -> Self {
+        Self { q: VecDeque::new() }
+    }
+
+    fn push(&mut self, x: i32) {
+        self.q.push_back(x);
+    }
+
+    fn pop(&mut self) -> i32 {
+        self.q.pop_front().unwrap().to_owned()
+    }
+
+    fn peek(&self) -> i32 {
+        self.q.front().unwrap().to_owned()
+    }
+
+    fn empty(&self) -> bool {
+        self.q.is_empty()
+    }
+}
+
+#[derive(Default)]
+struct Trie2 {
+    children: [Option<Box<Trie2>>; 26],
+    is_end: bool,
+}
+
+impl Trie2 {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn insert(&mut self, word: &str) {
+        let mut s = self;
+        for &w in word.as_bytes() {
+            s = s.children[w as usize - 'a' as usize].get_or_insert(Box::new(Trie2::new()));
+        }
+        s.is_end = true;
+    }
+
+    pub fn dfs(&self, word: &str, index: usize, modified: i32) -> bool {
+        let s = self;
+        if s.is_end == true && index == word.len() && modified == 1 {
+            return true;
+        }
+        if index < word.len() && modified < 2 {
+            for i in 0..26 {
+                let b = word.as_bytes();
+                let next = if b[index] as usize - 'a' as usize == i {
+                    modified
+                } else {
+                    modified + 1
+                };
+                if let Some(ref child) = s.children[i] {
+                    if child.dfs(word, index + 1, next) {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+}
+
+struct MagicDictionary {
+    trie: Trie2,
+}
+
+impl MagicDictionary {
+    fn new() -> Self {
+        Self { trie: Trie2::new() }
+    }
+
+    fn build_dict(&mut self, dictionary: Vec<String>) {
+        for s in dictionary {
+            self.trie.insert(&s);
+        }
+    }
+
+    fn search(&self, search_word: String) -> bool {
+        self.trie.dfs(&search_word, 0, 0)
+    }
+}
+
+#[derive(Default)]
+struct Trie {
+    trie: [Option<Box<Trie>>; 26],
+    is_end: bool,
+}
+
+impl Trie {
+    fn new() -> Self {
+        Trie::default()
+    }
+
+    fn insert(&mut self, word: String) {
+        let mut s = self;
+        for &u in word.as_bytes() {
+            s = s.trie[u as usize - 'a' as usize].get_or_insert(Box::new(Trie::new()));
+        }
+        s.is_end = true;
+    }
+
+    fn search(&self, word: String) -> bool {
+        let mut s = self;
+        for (i, &u) in word.as_bytes().iter().enumerate() {
+            if let Some(ref child) = s.trie[u as usize - 'a' as usize] {
+                s = child;
+            } else {
+                return false;
+            }
+            if i == word.len() - 1 && s.is_end {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn starts_with(&self, prefix: String) -> bool {
+        let mut s = self;
+        for (i, &u) in prefix.as_bytes().iter().enumerate() {
+            if let Some(ref child) = s.trie[u as usize - 'a' as usize] {
+                s = child;
+            } else {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+struct Solution {
+    acc: Vec<i32>,
+    total: i32,
+}
+
+impl Solution {
+    fn new(w: Vec<i32>) -> Self {
+        let mut acc = vec![];
+        acc.push(w[0]);
+        let mut total = w[0];
+        for i in 1..w.len() {
+            acc.push(acc[i - 1] + w[i]);
+            total += w[i];
+        }
+        Self { acc, total }
+    }
+
+    fn pick_index(&self) -> i32 {
+        let mut rng = rand::thread_rng();
+        let n = rng.gen_range(1..=self.total);
+        match self.acc.binary_search(&n) {
+            Ok(i) => i as i32,
+            Err(i) => i as i32,
+        }
     }
 }

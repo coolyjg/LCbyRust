@@ -1,6 +1,7 @@
 use rand::{self, random};
 use std::cmp::Ordering;
 use std::collections::{HashMap, VecDeque};
+use std::vec;
 
 pub fn minimum_difference(nums: Vec<i32>, k: i32) -> i32 {
     if k == 1 {
@@ -3082,4 +3083,915 @@ pub fn minimum_abs_difference(arr: Vec<i32>) -> Vec<Vec<i32>> {
         }
     }
     ans
+}
+
+pub fn replace_words(dictionary: Vec<String>, sentence: String) -> String {
+    let sentence = sentence
+        .split(" ")
+        .map(|s| s.to_owned())
+        .collect::<Vec<String>>();
+    let mut ans: Vec<String> = vec![];
+    for (i, s) in sentence.into_iter().enumerate() {
+        let mut flag = false;
+        for a in dictionary.iter() {
+            if s.starts_with(a) {
+                flag = true;
+                if ans.len() >= i + 1 {
+                    if ans[i].len() > a.len() {
+                        ans[i] = a.to_owned();
+                    }
+                } else {
+                    ans.push(a.to_owned());
+                }
+            }
+        }
+        if flag == false {
+            ans.push(s);
+        }
+    }
+    let mut ret = String::from("");
+    let mut cnt = ans.len();
+    for s in ans.into_iter() {
+        ret.push_str(&s);
+        cnt -= 1;
+        if cnt != 0 {
+            ret.push_str(" ");
+        }
+    }
+    ret
+}
+
+pub fn min_cost_to_move_chips(position: Vec<i32>) -> i32 {
+    position
+        .iter()
+        .fold((0, 0, 0), |acc, x| {
+            (
+                acc.0 + x % 2,
+                acc.1 + (x + 1) % 2,
+                (acc.0 + x % 2).min(acc.1 + (x + 1) % 2),
+            )
+        })
+        .2
+}
+
+pub fn reverse_bits(x: u32) -> u32 {
+    let mut ans = 0;
+    let mut cnt = 32;
+    let mut x = x;
+    while cnt > 0 {
+        cnt -= 1;
+        ans = (ans << 1) + x % 2;
+        x = x >> 1;
+    }
+    ans
+}
+
+pub fn is_isomorphic(s: String, t: String) -> bool {
+    if s.len() != t.len() {
+        return false;
+    }
+    let mut s2t = HashMap::new();
+    let mut t2s = HashMap::new();
+    let s = s.chars().collect::<Vec<char>>();
+    let t = t.chars().collect::<Vec<char>>();
+    for i in 0..s.len() {
+        let ss = s2t.get(&s[i]);
+        let tt = t2s.get(&t[i]);
+        match (ss, tt) {
+            (Some(ss), Some(tt)) => {
+                if s[i] != *tt || t[i] != *ss {
+                    return false;
+                }
+            }
+            (Some(_), None) => {
+                return false;
+            }
+            (None, Some(_)) => {
+                return false;
+            }
+            (None, None) => {
+                s2t.insert(s[i], t[i]);
+                t2s.insert(t[i], s[i]);
+            }
+        }
+    }
+    true
+}
+
+pub fn is_power_of_two(n: i32) -> bool {
+    if n >= 0 && (n & (n - 1)) == 0 {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_ugly(n: i32) -> bool {
+    if n <= 1 {
+        return false;
+    }
+    let mut n = n;
+    while n % 2 == 0 {
+        n = n >> 1;
+    }
+    while n % 3 == 0 {
+        n /= 3;
+    }
+    while n % 5 == 0 {
+        n /= 5;
+    }
+    if n == 1 {
+        return true;
+    }
+    false
+}
+
+pub fn missing_number(nums: Vec<i32>) -> i32 {
+    let mut or_sum = 0;
+    for i in 0..=nums.len() as i32 {
+        or_sum ^= i;
+    }
+    for num in nums {
+        or_sum ^= num;
+    }
+    or_sum
+}
+
+pub fn move_zeroes(nums: &mut Vec<i32>) {
+    let mut j = 0;
+    let mut idx = j;
+    while j < nums.len() as i32 {
+        if nums[j as usize] != 0 {
+            j += 1;
+        } else {
+            let mut i = (j + 1).max(idx);
+            while i < nums.len() as i32 && nums[i as usize] == 0 {
+                i += 1;
+            }
+            if i == nums.len() as i32 {
+                return;
+            } else {
+                nums.swap(i as usize, j as usize);
+                idx = i + 1;
+            }
+            j += 1;
+        }
+    }
+}
+
+pub fn word_pattern(pattern: String, s: String) -> bool {
+    let mut p2s = HashMap::new();
+    let mut s2p = HashMap::new();
+    let pattern = pattern.chars().collect::<Vec<char>>();
+    let s = s.split(" ").map(|s| s.to_string()).collect::<Vec<String>>();
+    if pattern.len() != s.len() {
+        return false;
+    }
+    for i in 0..pattern.len() {
+        let pp = p2s.get(&pattern[i]);
+        let ss = s2p.get(&s[i]);
+        match (pp, ss) {
+            (None, None) => {
+                p2s.insert(pattern[i], s[i].clone());
+                s2p.insert(s[i].clone(), pattern[i]);
+            }
+            (Some(_), None) | (None, Some(_)) => {
+                return false;
+            }
+            (Some(pp), Some(ss)) => {
+                if *pp != s[i] || *ss != pattern[i] {
+                    return false;
+                }
+            }
+        }
+    }
+    true
+}
+
+pub fn is_power_of_three(n: i32) -> bool {
+    if n <= 0 {
+        return false;
+    }
+    let mut n = n;
+    while n % 3 == 0 {
+        n /= 3;
+    }
+    if n == 1 {
+        return true;
+    }
+    false
+}
+
+pub fn len_longest_fib_subseq(arr: Vec<i32>) -> i32 {
+    let mut hp = HashMap::<i32, usize>::new();
+    for (i, n) in arr.iter().enumerate() {
+        hp.insert(*n, i);
+    }
+    let mut ans = 0;
+    let mut dp = vec![vec![0; arr.len()]; arr.len()];
+    for i in 0..arr.len() {
+        if i < 1 {
+            continue;
+        }
+        for j in (0..=i - 1).rev() {
+            if arr[j] * 2 <= arr[i] {
+                break;
+            }
+            if let Some(&idx) = hp.get(&(arr[i] - arr[j])) {
+                dp[j][i] = dp[j][i].max((dp[idx][j] + 1).max(3));
+            }
+            ans = ans.max(dp[j][i]);
+        }
+    }
+    ans
+}
+
+pub fn cherry_pickup(grid: Vec<Vec<i32>>) -> i32 {
+    let ans;
+    let n = grid.len() as i32;
+    let mut dp = vec![vec![vec![i32::MIN; n as usize]; n as usize]; 2 * n as usize - 1];
+    dp[0][0][0] = grid[0][0];
+    for k in 1..2 * n - 1 {
+        for x1 in (k - n + 1).max(0)..=k.min(n - 1) {
+            let y1 = k - x1;
+            if grid[x1 as usize][y1 as usize] == -1 {
+                continue;
+            }
+            for x2 in x1..=k.min(n - 1) {
+                let y2 = k - x2;
+                if grid[x2 as usize][y2 as usize] == -1 {
+                    continue;
+                }
+                let mut res = dp[k as usize - 1][x1 as usize][x2 as usize];
+                if x1 != 0 {
+                    res = res.max(dp[k as usize - 1][x1 as usize - 1][x2 as usize]);
+                }
+                if x2 != 0 {
+                    res = res.max(dp[k as usize - 1][x1 as usize][x2 as usize - 1]);
+                }
+                if x1 != 0 && x2 != 0 {
+                    res = res.max(dp[k as usize - 1][x1 as usize - 1][x2 as usize - 1]);
+                }
+                res += grid[x1 as usize][y1 as usize];
+                if x1 != x2 {
+                    res += grid[x2 as usize][y2 as usize];
+                }
+                dp[k as usize][x1 as usize][x2 as usize] = res;
+            }
+        }
+    }
+    ans = dp[2 * n as usize - 2][n as usize - 1][n as usize - 1].max(0);
+    ans
+}
+
+pub fn odd_cells(m: i32, n: i32, indices: Vec<Vec<i32>>) -> i32 {
+    let mut array = vec![vec![0; n as usize]; m as usize];
+    let mut ans = 0;
+    for index in indices {
+        for j in 0..n as usize {
+            array[index[0] as usize][j] += 1;
+        }
+        for i in 0..m as usize {
+            array[i][index[1] as usize] += 1;
+        }
+    }
+    for i in 0..m as usize {
+        for j in 0..n as usize {
+            if array[i][j] % 2 != 0 {
+                ans += 1;
+            }
+        }
+    }
+    ans
+}
+
+pub fn compute_area(
+    ax1: i32,
+    ay1: i32,
+    ax2: i32,
+    ay2: i32,
+    bx1: i32,
+    by1: i32,
+    bx2: i32,
+    by2: i32,
+) -> i32 {
+    let area1 = (ax2 - ax1) * (ay2 - ay1);
+    let area2 = (bx2 - bx1) * (by2 - by1);
+    if ax2 <= bx1 || ax1 >= bx2 || ay2 <= by1 || ay1 >= by2 {
+        return area1 + area2;
+    }
+    let mut x = vec![ax1, ax2, bx1, bx2];
+    let mut y = vec![ay1, ay2, by1, by2];
+    x.sort();
+    y.sort();
+    area1 + area2 - (x[2] - x[1]) * (y[2] - y[1])
+}
+
+pub fn num_squares(n: i32) -> i32 {
+    fn is_square(n: i32) -> bool {
+        let nr = (n as f64).sqrt() as i32;
+        return nr * nr == n;
+    }
+    fn is4square(n: i32) -> bool {
+        let mut n = n;
+        while n % 4 == 0 {
+            n /= 4;
+        }
+        return n % 8 == 7;
+    }
+    if is_square(n) {
+        return 1;
+    } else if is4square(n) {
+        return 4;
+    }
+    for i in 1..=(n as f64).sqrt() as i32 {
+        let j = n - i * i;
+        if is_square(j) {
+            return 2;
+        }
+    }
+    return 3;
+}
+
+pub fn asteroid_collision(asteroids: Vec<i32>) -> Vec<i32> {
+    let mut st = vec![];
+    for asteroid in asteroids {
+        if asteroid < 0 {
+            if st.is_empty() {
+                st.push(asteroid);
+                continue;
+            }
+            while let Some(a) = st.pop() {
+                if a < 0 {
+                    st.push(a);
+                    st.push(asteroid);
+                    break;
+                } else if a < asteroid.abs() {
+                    if st.is_empty() {
+                        st.push(asteroid);
+                        break;
+                    }
+                    continue;
+                } else if a > asteroid.abs() {
+                    st.push(a);
+                    break;
+                } else {
+                    break;
+                }
+            }
+        } else {
+            st.push(asteroid);
+        }
+    }
+    st
+}
+
+pub fn get_money_amount(n: i32) -> i32 {
+    let mut dp = vec![vec![0; n as usize + 1]; n as usize + 1];
+    for i in (1..=n as usize - 1).rev() {
+        for j in i + 1..=n as usize {
+            dp[i][j] = j as i32 + dp[i][j - 1];
+            for k in i..j {
+                dp[i][j] = dp[i][j].min(k as i32 + dp[i][k - 1].max(dp[k + 1][j]));
+            }
+        }
+    }
+    dp[1][n as usize]
+}
+
+pub fn predict_the_winner(nums: Vec<i32>) -> bool {
+    let mut dp = vec![vec![0; nums.len()]; nums.len()];
+    for i in 0..nums.len() {
+        dp[i][i] = nums[i];
+    }
+    for i in (0..nums.len()).rev() {
+        for j in i + 1..nums.len() {
+            dp[i][j] = (nums[i] - dp[i + 1][j]).max(nums[j] - dp[i][j - 1]);
+        }
+    }
+    if dp[0][nums.len() - 1] >= 0 {
+        return true;
+    }
+    false
+}
+
+pub fn stone_game(piles: Vec<i32>) -> bool {
+    let mut dp = vec![vec![0; piles.len()]; piles.len()];
+    for i in 0..piles.len() {
+        dp[i][i] = piles[i];
+    }
+    for i in (0..piles.len()).rev() {
+        for j in i + 1..piles.len() {
+            dp[i][j] = (piles[i] - dp[i + 1][j]).max(piles[j] - dp[i][j - 1]);
+        }
+    }
+    if dp[0][piles.len() - 1] > 0 {
+        return true;
+    }
+    false
+}
+
+pub fn stone_game_iii(stone_value: Vec<i32>) -> String {
+    let n = stone_value.len();
+    let mut dp = vec![0; n + 1];
+    dp[n - 1] = stone_value[n - 1];
+    dp[n] = 0;
+    for i in (0..n - 1).rev() {
+        dp[i] = stone_value[i] - dp[i + 1];
+        if n - i >= 2 {
+            dp[i] = dp[i].max(stone_value[i] + stone_value[i + 1] - dp[i + 2]);
+        }
+        if n - i >= 3 {
+            dp[i] = dp[i].max(stone_value[i] + stone_value[i + 1] + stone_value[i + 2] - dp[i + 3]);
+        }
+    }
+    if dp[0] > 0 {
+        return "Alice".to_owned();
+    } else if dp[0] == 0 {
+        return "Tie".to_owned();
+    } else {
+        return "Bob".to_owned();
+    }
+}
+
+pub fn winner_square_game(n: i32) -> bool {
+    let n = n as usize;
+    let mut dp = vec![false; n + 2];
+    dp[n] = true;
+    dp[n + 1] = false;
+    for i in (1..n).rev() {
+        let mut j = 1;
+        loop {
+            if j * j <= n - i + 1 {
+                dp[i] = dp[i] || !dp[i + j * j];
+                if dp[i] == true {
+                    break;
+                }
+            } else {
+                break;
+            }
+            j += 1;
+        }
+    }
+    dp[1]
+}
+
+pub fn max_coins(piles: Vec<i32>) -> i32 {
+    let mut piles = piles;
+    piles.sort();
+    let mut i = 0;
+    let mut ans = 0;
+    let mut j = piles.len() - 1;
+    while i < j {
+        ans += piles[j - 1];
+        i += 1;
+        j -= 2;
+    }
+    ans
+}
+pub fn stone_game_vi(alice_values: Vec<i32>, bob_values: Vec<i32>) -> i32 {
+    let n = alice_values.len();
+    let mut total = vec![(0, 0); n];
+    for i in 0..n {
+        total[i].0 = alice_values[i] + bob_values[i];
+        total[i].1 = i;
+    }
+    total.sort_by(|a, b| b.0.cmp(&a.0));
+    let mut sum1 = 0;
+    let mut sum2 = 0;
+    for i in 0..n {
+        if i % 2 == 0 {
+            sum1 += alice_values[total[i].1];
+        } else {
+            sum2 += bob_values[total[i].1];
+        }
+    }
+    if sum1 > sum2 {
+        return 1;
+    } else if sum1 == sum2 {
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+pub fn repeated_string_match(a: String, b: String) -> i32 {
+    let lena = a.len();
+    let lenb = b.len();
+    let n = 3 + lenb / lena;
+    let mut s = a.clone();
+    for i in 1..=n {
+        if s.contains(&b.clone()) {
+            return i as i32;
+        }
+        s = s + &a.clone();
+    }
+    -1
+}
+
+pub fn camel_match(queries: Vec<String>, pattern: String) -> Vec<bool> {
+    let mut ans = vec![];
+    let pattern = pattern.chars().collect::<Vec<char>>();
+    let n = pattern.len();
+    for query in queries {
+        let q = query.as_bytes();
+        let (mut i, mut j) = (0, 0);
+        let mut flag = true;
+        while i < n && j < q.len() {
+            if q[j] != pattern[i] as u8 {
+                if q[j].is_ascii_lowercase() {
+                    j += 1;
+                    continue;
+                } else {
+                    ans.push(false);
+                    flag = false;
+                    break;
+                }
+            } else if q[j] == pattern[i] as u8 {
+                i += 1;
+                j += 1;
+                continue;
+            }
+        }
+        if flag == false {
+            continue;
+        } else {
+            if i == n {
+                while j < q.len() {
+                    if !q[j].is_ascii_lowercase() {
+                        ans.push(false);
+                        flag = false;
+                        break;
+                    }
+                    j += 1;
+                }
+                if flag == false {
+                    continue;
+                } else {
+                    ans.push(true);
+                }
+            } else {
+                ans.push(false);
+            }
+        }
+    }
+    ans
+}
+
+pub fn string_matching(words: Vec<String>) -> Vec<String> {
+    let mut ans = vec![];
+    let mut words = words;
+    words.sort_by(|a, b| a.len().cmp(&b.len()));
+    for i in 0..words.len() {
+        for j in i + 1..words.len() {
+            if words[j].contains(&words[i]) {
+                ans.push(words[i].clone());
+                break;
+            }
+        }
+    }
+    ans
+}
+
+pub fn is_prefix_of_word(sentence: String, search_word: String) -> i32 {
+    let sentence = sentence.split(" ").collect::<Vec<_>>();
+    for (i, s) in sentence.iter().enumerate() {
+        if s.strip_prefix(&search_word).is_some() {
+            return i as i32 + 1;
+        }
+    }
+    -1
+}
+
+pub fn max_repeating(sequence: String, word: String) -> i32 {
+    let n = sequence.len() / word.len();
+    let mut s = word.clone();
+    let mut ret = 0;
+    for i in 1..=n {
+        if sequence.contains(&s) {
+            ret = i as i32;
+        }
+        s = s + &word.clone();
+    }
+    ret
+}
+
+pub fn is_fliped_string(s1: String, s2: String) -> bool {
+    if s1.len() != s2.len() {
+        return false;
+    } else if s1.is_empty() {
+        return true;
+    } else if s1 == s2 {
+        return true;
+    }
+    let s = s1.clone() + &s1;
+    if s.contains(&s2) {
+        return true;
+    }
+    false
+}
+
+pub fn multi_search(big: String, smalls: Vec<String>) -> Vec<Vec<i32>> {
+    let mut ans = vec![];
+    for small in smalls {
+        if small.is_empty() {
+            ans.push(vec![]);
+            continue;
+        }
+        let mut temp = vec![];
+        let mut big = big.clone();
+        let mut pre = 0;
+        while let Some(idx) = big.find(&small) {
+            temp.push(idx as i32 + pre as i32);
+            let mut itr = big.chars().collect::<Vec<_>>();
+            itr.drain(0..=idx);
+            big = itr.iter().collect();
+            pre += idx + 1;
+        }
+        ans.push(temp);
+    }
+    ans
+}
+
+pub fn can_choose(groups: Vec<Vec<i32>>, nums: Vec<i32>) -> bool {
+    let mut anchor = 0;
+    for group in groups {
+        let mut flag = false;
+        let mut t = 0;
+        for idx in anchor..nums.len() {
+            if nums[idx] == group[0] {
+                flag = true;
+                let len = group.len();
+                if nums.len() - idx < len {
+                    return false;
+                } else {
+                    for k in idx..idx + len {
+                        if nums[k] != group[k - idx] {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if flag {
+                        t = idx;
+                        break;
+                    }
+                }
+            }
+        }
+        if flag {
+            anchor = t + group.len()
+        } else {
+            return false;
+        }
+    }
+    true
+}
+
+pub fn shift_grid(grid: Vec<Vec<i32>>, k: i32) -> Vec<Vec<i32>> {
+    let mut ans = vec![vec![0; grid[0].len()]; grid.len()];
+    let m = grid.len();
+    let n = grid[0].len();
+    let k = k as usize % (m * n);
+    for i in 0..m {
+        for j in 0..n {
+            let ni = (i + (j + k) / n) % m;
+            let nj = (j + k) % n;
+            ans[ni][nj] = grid[i][j];
+        }
+    }
+    ans
+}
+
+pub fn permutation(s: String) -> Vec<String> {
+    let mut ans = vec![];
+    let s = s.chars().collect::<Vec<_>>();
+    let mut map = vec![false; s.len()];
+    let n = s.len();
+    fn dfs(
+        s: &Vec<char>,
+        map: &mut Vec<bool>,
+        n: usize,
+        ans: &mut Vec<String>,
+        tmp: &mut Vec<char>,
+    ) {
+        if tmp.len() == n {
+            ans.push(tmp.iter().collect());
+            return;
+        } else {
+            for i in 0..n {
+                if map[i] == false {
+                    map[i] = true;
+                    tmp.push(s[i]);
+                    dfs(s, map, n, ans, tmp);
+                    tmp.pop();
+                    map[i] = false;
+                }
+            }
+        }
+    }
+    let mut tmp = vec![];
+    dfs(&s, &mut map, n, &mut ans, &mut tmp);
+    ans
+}
+
+pub fn max_ice_cream(costs: Vec<i32>, coins: i32) -> i32 {
+    let mut costs = costs;
+    costs.sort();
+    let mut ans = 0;
+    let mut coins = coins;
+    for i in 0..costs.len() {
+        if coins >= costs[i] {
+            ans += 1;
+            coins -= costs[i];
+        } else {
+            break;
+        }
+    }
+    ans
+}
+
+pub fn two_city_sched_cost(costs: Vec<Vec<i32>>) -> i32 {
+    let mut diff = costs.iter().map(|c| c[0] - c[1]).collect::<Vec<_>>();
+    let mut sumb = costs.iter().fold(0, |acc, x| acc + x[1]);
+    diff.sort();
+    for i in 0..costs.len() / 2 {
+        sumb += diff[i];
+    }
+    sumb
+}
+
+pub fn min_cost_1547(n: i32, cuts: Vec<i32>) -> i32 {
+    let mut idx = vec![0; cuts.len() + 2];
+    let mut cuts = cuts;
+    cuts.sort();
+    let m = cuts.len();
+    for i in 1..=cuts.len() {
+        idx[i] = cuts[i - 1];
+    }
+    idx[m + 1] = n;
+    let mut dp = vec![vec![0; m + 2]; m + 2];
+    for i in (1..=m).rev() {
+        for j in i..=m {
+            dp[i][j] = dp[i][i - 1] + dp[i + 1][j];
+            for k in i + 1..=j {
+                dp[i][j] = dp[i][j].min(dp[i][k - 1] + dp[k + 1][j]);
+            }
+            dp[i][j] += idx[j + 1] - idx[i - 1];
+        }
+    }
+    dp[1][m]
+}
+
+pub fn get_last_moment(n: i32, left: Vec<i32>, right: Vec<i32>) -> i32 {
+    left.iter()
+        .fold(0, |acc, x| acc.max(x - 0))
+        .max(right.iter().fold(0, |acc, x| acc.max(n - x)))
+}
+
+pub fn num_of_pairs(nums: Vec<String>, target: String) -> i32 {
+    let mut ans = 0;
+    for i in 0..nums.len() {
+        for j in 0..nums.len() {
+            if i == j {
+                continue;
+            }
+            if nums[i].clone() + &nums[j] == target {
+                ans += 1;
+            }
+        }
+    }
+    ans
+}
+
+pub fn sum_zero(n: i32) -> Vec<i32> {
+    let mut ans = vec![];
+    if n % 2 == 1 {
+        ans.push(0);
+    }
+    for i in 1..=n / 2 {
+        ans.push(i);
+        ans.push(-i);
+    }
+    ans
+}
+
+pub fn max_chunks_to_sorted(arr: Vec<i32>) -> i32 {
+    if arr.len() == 1 {
+        return 1;
+    }
+    let mut ans = 0;
+    let mut bound = arr[0];
+    if bound == arr.len() as i32 - 1 {
+        return 1;
+    }
+    for (i, &num) in arr.iter().enumerate().skip(1) {
+        if i as i32 > bound {
+            ans += 1;
+            bound = num;
+            if bound == arr.len() as i32 - 1 {
+                ans += 1;
+                break;
+            }
+        } else {
+            if num > bound {
+                bound = num;
+                if bound == arr.len() as i32 - 1 {
+                    ans += 1;
+                    break;
+                }
+            }
+        }
+    }
+    ans
+}
+
+pub fn flip_and_invert_image(image: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut ans = vec![];
+    for i in 0..image.len() {
+        ans.push(
+            image[i]
+                .clone()
+                .into_iter()
+                .map(|x| 1 - x)
+                .rev()
+                .collect::<Vec<_>>(),
+        );
+    }
+    ans
+}
+
+pub fn validate_stack_sequences(pushed: Vec<i32>, popped: Vec<i32>) -> bool {
+    let mut st = vec![];
+    let mut anchor = 0;
+    for i in 0..pushed.len() {
+        st.push(pushed[i]);
+        while !st.is_empty() && *st.last().unwrap() == popped[anchor] {
+            st.pop();
+            anchor += 1;
+        }
+    }
+    if anchor == popped.len() {
+        return true;
+    } else {
+        while !st.is_empty() {
+            if *st.last().unwrap() == popped[anchor] {
+                st.pop();
+                anchor += 1;
+            } else {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+pub fn sequence_reconstruction(nums: Vec<i32>, sequences: Vec<Vec<i32>>) -> bool {
+    let n = nums.len();
+    let mut indegree = vec![0; n];
+    let mut hp = HashMap::new();
+    for s in sequences {
+        for i in 1..s.len() {
+            indegree[s[i] as usize - 1] += 1;
+            let e = hp.entry(s[i - 1]).or_insert(vec![]);
+            e.push(s[i]);
+        }
+    }
+    let mut st = vec![];
+    for i in indegree.iter() {
+        if *i == 0 {
+            st.push(*i + 1);
+        }
+    }
+    if st.len() > 1 {
+        return false;
+    }
+    while !st.is_empty() {
+        let s = st.pop().unwrap();
+        let v = hp.get(&s);
+        if v.is_none() {
+            break;
+        }
+        let v = v.unwrap().clone();
+        for node in v {
+            indegree[node as usize - 1] -= 1;
+            if indegree[node as usize - 1] == 0 {
+                st.push(node);
+            }
+        }
+        if st.len() > 1 {
+            return false;
+        }
+    }
+    true
+}
+
+pub fn distance_between_bus_stops(distance: Vec<i32>, start: i32, destination: i32) -> i32 {
+    let total = distance.iter().sum::<i32>();
+    let min = start.min(destination);
+    let max = start.max(destination);
+    let mut ans = 0;
+    for i in min..max {
+        ans += distance[i as usize];
+    }
+    ans.min(total - ans)
 }

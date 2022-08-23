@@ -425,3 +425,226 @@ pub fn prune_tree(root: Option<Rc<RefCell<TreeNode>>>) -> Option<Rc<RefCell<Tree
         }
     }
 }
+
+#[allow(dead_code)]
+struct CBTInserter {
+    nodes: Vec<Option<Rc<RefCell<TreeNode>>>>,
+}
+
+#[allow(dead_code)]
+impl CBTInserter {
+    fn new(root: Option<Rc<RefCell<TreeNode>>>) -> Self {
+        let mut vq = VecDeque::new();
+        vq.push_back(root);
+        let mut nodes = Vec::new();
+        while !vq.is_empty() {
+            let node = vq.pop_front().unwrap();
+            let left = node.as_ref().unwrap().borrow().left.clone();
+            let right = node.as_ref().unwrap().borrow().right.clone();
+            if left.is_some() {
+                vq.push_back(left);
+            }
+            if right.is_some() {
+                vq.push_back(right);
+            }
+            nodes.push(node);
+        }
+        Self { nodes }
+    }
+
+    fn insert(&mut self, val: i32) -> i32 {
+        let new_node = TreeNode::new(val);
+        let n = self.nodes.len();
+        self.nodes.push(Some(Rc::new(RefCell::new(new_node))));
+        let father_idx = (n - 1) / 2;
+        let mut father = self.nodes[father_idx].as_ref().unwrap().borrow_mut();
+        if n % 2 == 1 {
+            father.left = self.nodes[n].clone();
+        } else {
+            father.right = self.nodes[n].clone();
+        }
+        let val = father.val;
+        return val;
+    }
+
+    fn get_root(&self) -> Option<Rc<RefCell<TreeNode>>> {
+        self.nodes[0].clone()
+    }
+}
+
+pub fn max_level_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    let mut sums = vec![];
+    let mut q = VecDeque::new();
+    q.push_back(root);
+    let mut cnt = 1;
+    while !q.is_empty() {
+        let mut tmp = 0;
+        let mut new_cnt = 0;
+        for _ in 0..cnt {
+            let node = q.pop_front().unwrap();
+            let left = node.as_ref().unwrap().borrow().left.clone();
+            let right = node.as_ref().unwrap().borrow().right.clone();
+            let val = node.as_ref().unwrap().borrow().val;
+            tmp += val;
+            if left.is_some() {
+                q.push_back(left);
+                new_cnt += 1;
+            }
+            if right.is_some() {
+                q.push_back(right);
+                new_cnt += 1;
+            }
+        }
+        sums.push(tmp);
+        cnt = new_cnt;
+    }
+    let mut max = i32::MIN;
+    let mut ans = 0;
+    for (idx, sum) in sums.iter().enumerate() {
+        if *sum > max {
+            ans = idx + 1;
+            max = *sum;
+        }
+    }
+    ans as i32
+}
+
+pub fn add_one_row(
+    root: Option<Rc<RefCell<TreeNode>>>,
+    val: i32,
+    depth: i32,
+) -> Option<Rc<RefCell<TreeNode>>> {
+    if depth == 1 {
+        let mut ret = Some(Rc::new(RefCell::new(TreeNode::new(val))));
+        ret.as_mut().unwrap().borrow_mut().left = root;
+        return ret;
+    }
+    let mut levels = VecDeque::new();
+    let mut cnt = 1;
+    let root = root;
+    let mut node_cnt = 1;
+    levels.push_back(root.clone());
+    while !levels.is_empty() {
+        cnt += 1;
+        if cnt == depth {
+            while !levels.is_empty() {
+                let node = levels.pop_front().unwrap();
+                let left = node.clone().unwrap().borrow().left.clone();
+                let right = node.clone().unwrap().borrow().right.clone();
+                let mut new_node_left = Some(Rc::new(RefCell::new(TreeNode::new(val))));
+                new_node_left.as_mut().unwrap().borrow_mut().left = left;
+                let mut new_node_right = Some(Rc::new(RefCell::new(TreeNode::new(val))));
+                new_node_right.as_mut().unwrap().borrow_mut().right = right;
+                node.clone().unwrap().borrow_mut().left = new_node_left;
+                node.clone().unwrap().borrow_mut().right = new_node_right;
+            }
+            break;
+        } else {
+            let mut tmp = 0;
+            while node_cnt > 0 {
+                node_cnt -= 1;
+                let node = levels.pop_front().unwrap();
+                let left = node.clone().unwrap().borrow().left.clone();
+                let right = node.clone().unwrap().borrow().right.clone();
+                if left.is_some() {
+                    levels.push_back(left.clone());
+                    tmp += 1;
+                }
+                if right.is_some() {
+                    levels.push_back(right.clone());
+                    tmp += 1;
+                }
+            }
+            node_cnt = tmp;
+        }
+    }
+    root
+}
+
+pub fn deepest_leaves_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    let mut q = VecDeque::new();
+    let mut sum = 0;
+    let mut cnt = 1;
+    q.push_back(root);
+    while !q.is_empty() {
+        let mut n = 0;
+        sum = 0;
+        for _ in 0..cnt {
+            let node = q.pop_front().unwrap();
+            let val = node.clone().unwrap().borrow().val;
+            let left = node.clone().unwrap().borrow().left.clone();
+            let right = node.clone().unwrap().borrow().right.clone();
+            if left.is_some() {
+                q.push_back(left);
+                n += 1;
+            }
+            if right.is_some() {
+                q.push_back(right);
+                n += 1;
+            }
+            sum += val;
+        }
+        cnt = n;
+    }
+    sum
+}
+
+pub fn construct_maximum_binary_tree(nums: Vec<i32>) -> Option<Rc<RefCell<TreeNode>>> {
+    fn helper(nums: &Vec<i32>, left: i32, right: i32) -> Option<Rc<RefCell<TreeNode>>> {
+        if left > right {
+            return None;
+        }
+        let mut max = i32::MIN;
+        let mut idx = 0;
+        for i in left..=right {
+            if nums[i as usize] > max {
+                max = nums[i as usize];
+                idx = i;
+            }
+        }
+        let mut node = TreeNode::new(nums[idx as usize]);
+        node.left = helper(nums, left, idx - 1);
+        node.right = helper(nums, idx + 1, right);
+        Some(Rc::new(RefCell::new(node)))
+    }
+    let root = helper(&nums, 0, nums.len() as i32 - 1);
+    root
+}
+
+pub fn print_tree(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<String>> {
+    fn get_depth(root: &Option<Rc<RefCell<TreeNode>>>) -> usize {
+        if let Some(r) = root {
+            1 + get_depth(&r.borrow().left).max(get_depth(&r.borrow().right))
+        } else {
+            0
+        }
+    }
+    let n = get_depth(&root);
+    let m = (1 << n) - 1;
+    let mut queue = vec![];
+    let mut grid = vec![vec!["".to_string(); m]; n];
+
+    if let Some(r) = root {
+        queue.push((r, 0, (m - 1) / 2));
+
+        while queue.len() > 0 {
+            let mut tmp = vec![];
+
+            for i in 0..queue.len() {
+                let (ref node, row, col) = queue[i];
+                grid[row][col] = format!("{}", node.borrow().val);
+
+                if let Some(left) = node.borrow_mut().left.take() {
+                    tmp.push((left, row + 1, col - (1 << (n - row - 2))));
+                }
+
+                if let Some(right) = node.borrow_mut().right.take() {
+                    tmp.push((right, row + 1, col + (1 << (n - row - 2))));
+                }
+            }
+
+            queue = tmp;
+        }
+    }
+    grid
+}

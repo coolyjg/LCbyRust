@@ -738,10 +738,12 @@ impl MyCalendar {
     }
 }
 
+#[allow(dead_code)]
 struct MyStack {
     st: Vec<i32>,
 }
 
+#[allow(dead_code)]
 impl MyStack {
     fn new() -> Self {
         Self { st: Vec::new() }
@@ -764,10 +766,12 @@ impl MyStack {
     }
 }
 
+#[allow(dead_code)]
 struct MyQueue {
     q: VecDeque<i32>,
 }
 
+#[allow(dead_code)]
 impl MyQueue {
     fn new() -> Self {
         Self { q: VecDeque::new() }
@@ -790,12 +794,14 @@ impl MyQueue {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Default)]
 struct Trie2 {
     children: [Option<Box<Trie2>>; 26],
     is_end: bool,
 }
 
+#[allow(dead_code)]
 impl Trie2 {
     pub fn new() -> Self {
         Self::default()
@@ -833,10 +839,12 @@ impl Trie2 {
     }
 }
 
+#[allow(dead_code)]
 struct MagicDictionary {
     trie: Trie2,
 }
 
+#[allow(dead_code)]
 impl MagicDictionary {
     fn new() -> Self {
         Self { trie: Trie2::new() }
@@ -853,12 +861,14 @@ impl MagicDictionary {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Default)]
 struct Trie {
     trie: [Option<Box<Trie>>; 26],
     is_end: bool,
 }
 
+#[allow(dead_code)]
 impl Trie {
     fn new() -> Self {
         Trie::default()
@@ -889,7 +899,7 @@ impl Trie {
 
     fn starts_with(&self, prefix: String) -> bool {
         let mut s = self;
-        for (i, &u) in prefix.as_bytes().iter().enumerate() {
+        for (_, &u) in prefix.as_bytes().iter().enumerate() {
             if let Some(ref child) = s.trie[u as usize - 'a' as usize] {
                 s = child;
             } else {
@@ -900,11 +910,13 @@ impl Trie {
     }
 }
 
+#[allow(dead_code)]
 struct Solution {
     acc: Vec<i32>,
     total: i32,
 }
 
+#[allow(dead_code)]
 impl Solution {
     fn new(w: Vec<i32>) -> Self {
         let mut acc = vec![];
@@ -923,6 +935,225 @@ impl Solution {
         match self.acc.binary_search(&n) {
             Ok(i) => i as i32,
             Err(i) => i as i32,
+        }
+    }
+}
+
+//this is a fake implementation
+#[allow(dead_code)]
+struct Skiplist {
+    hp: HashMap<i32, i32>,
+}
+
+#[allow(dead_code)]
+impl Skiplist {
+    fn new() -> Self {
+        Self { hp: HashMap::new() }
+    }
+
+    fn search(&self, target: i32) -> bool {
+        if let Some(n) = self.hp.get(&target) {
+            if *n == 0 {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    fn add(&mut self, num: i32) {
+        let e = self.hp.entry(num).or_insert(0);
+        *e += 1;
+    }
+
+    fn erase(&mut self, num: i32) -> bool {
+        let e = self.hp.entry(num).or_insert(0);
+        if *e == 0 {
+            return false;
+        } else {
+            *e -= 1;
+            return true;
+        }
+    }
+}
+
+#[allow(dead_code)]
+struct MyCircularQueue {
+    q: Vec<i32>,
+    front: i32,
+    rear: i32,
+    cnt: i32,
+}
+
+#[allow(dead_code)]
+impl MyCircularQueue {
+    fn new(k: i32) -> Self {
+        Self {
+            q: vec![0; k as usize + 1],
+            front: 0,
+            rear: 0,
+            cnt: k + 1,
+        }
+    }
+
+    fn en_queue(&mut self, value: i32) -> bool {
+        if self.is_full() {
+            return false;
+        }
+        self.q[(self.rear % self.cnt) as usize] = value;
+        self.rear = (self.rear + 1) % self.cnt;
+        true
+    }
+
+    fn de_queue(&mut self) -> bool {
+        if self.is_empty() {
+            return false;
+        }
+        self.front = (self.front + 1) % self.cnt;
+        true
+    }
+
+    fn front(&self) -> i32 {
+        if self.is_empty() {
+            return -1;
+        }
+        self.q[self.front as usize]
+    }
+
+    fn rear(&self) -> i32 {
+        if self.is_empty() {
+            return -1;
+        }
+        self.q[((self.rear + self.cnt - 1) % self.cnt) as usize]
+    }
+
+    fn is_empty(&self) -> bool {
+        if self.front == self.rear {
+            return true;
+        }
+        false
+    }
+
+    fn is_full(&self) -> bool {
+        if (self.rear + 1) % self.cnt == self.front {
+            return true;
+        }
+        false
+    }
+}
+
+#[allow(dead_code)]
+struct MyCircularDeque {
+    q: Vec<i32>,
+    front: usize,
+    rear: usize,
+}
+
+#[allow(dead_code)]
+impl MyCircularDeque {
+    fn new(k: i32) -> Self {
+        Self {
+            q: vec![0; k as usize + 1],
+            front: 0,
+            rear: 0,
+        }
+    }
+
+    fn insert_front(&mut self, value: i32) -> bool {
+        if self.is_full() {
+            return false;
+        }
+        let idx = (self.front + self.q.len() - 1) % self.q.len();
+        self.q[idx] = value;
+        self.front = idx;
+        true
+    }
+
+    fn insert_last(&mut self, value: i32) -> bool {
+        if self.is_full() {
+            return false;
+        }
+        let idx = (self.rear + 1) % self.q.len();
+        self.q[self.rear] = value;
+        self.rear = idx;
+        true
+    }
+
+    fn delete_front(&mut self) -> bool {
+        if self.is_empty() {
+            return false;
+        }
+        let idx = (self.front + 1) % self.q.len();
+        self.front = idx;
+        true
+    }
+
+    fn delete_last(&mut self) -> bool {
+        if self.is_empty() {
+            return false;
+        }
+        let idx = (self.rear + self.q.len() - 1) % self.q.len();
+        self.rear = idx;
+        true
+    }
+
+    fn get_front(&self) -> i32 {
+        if self.is_empty() {
+            return -1;
+        }
+        self.q[self.front]
+    }
+
+    fn get_rear(&self) -> i32 {
+        if self.is_empty() {
+            return -1;
+        }
+        self.q[(self.rear + self.q.len() - 1) % self.q.len()]
+    }
+
+    fn is_empty(&self) -> bool {
+        if self.front == self.rear {
+            return true;
+        }
+        false
+    }
+
+    fn is_full(&self) -> bool {
+        if (self.rear + 1) % self.q.len() == self.front {
+            return true;
+        }
+        false
+    }
+}
+
+#[allow(dead_code)]
+struct OrderedStream {
+    n: usize,
+    ptr: usize,
+    values: Vec<Option<String>>,
+}
+
+#[allow(dead_code)]
+impl OrderedStream {
+    fn new(n: i32) -> Self {
+        Self {
+            n: n as usize,
+            ptr: 0,
+            values: vec![None; n as usize],
+        }
+    }
+
+    fn insert(&mut self, id_key: i32, value: String) -> Vec<String> {
+        self.values[id_key as usize - 1] = Some(value);
+        if self.ptr != id_key as usize - 1 {
+            return vec![];
+        } else {
+            let mut ret = vec![];
+            while self.ptr < self.n && self.values[self.ptr].is_some() {
+                ret.push(self.values[self.ptr].clone().unwrap());
+                self.ptr += 1;
+            }
+            ret
         }
     }
 }
